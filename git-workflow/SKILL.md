@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Ava's git/Graphite (gt) workflow at Datadog. Load BEFORE any git, gt, or gh pr command — including git commit, git push, git ac, git cr, gt ss, gt s, gt submit, creating branches, opening PRs, syncing, worktrees, or editing PR descriptions. Contains required aliases (git cr, git ac, gt ss --no-edit -q), branch naming (ava.silver/TICKET/desc), and the rule to never use git push.
+description: Ava's git/Graphite (gt) workflow at Datadog. Load BEFORE any git, gt, or gh pr command — including git commit, git push, git ac, git cr, gt ss, gt s, gt submit, creating branches, opening PRs, syncing, or worktrees. Contains required aliases (git cr, git ac, gt ss --no-edit -q), branch naming (ava.silver/TICKET/desc), and the rule to never use git push.
 user_invocable: false
 ---
 
@@ -48,27 +48,7 @@ gt ss --no-edit -q   # submit full stack, no interactive prompts, minimal/no oup
 - `--no-edit -q` skips interactive PR metadata prompts and minimizes output
 
 ## Creating PRs
-After creating a PR (via `git cr` or `gt ss`), update the PR description with `gh pr edit --body`. Check the repo's PR template (`.github/PULL_REQUEST_TEMPLATE.md` or similar) and fill it in. You should have enough context from the work done so far; if not, check the branch diff or the Jira ticket (if one was provided) for additional context.
-
-**Passing the body:** Use a `<<'EOF'` heredoc (single-quoted delimiter -- everything inside is literal, no escaping needed). Do NOT escape backticks with `\`` inside a single-quoted heredoc; they are already literal and the backslashes will appear verbatim in the PR body.
-
-### QA Links
-
-When making PRs for the UI, always include clickable staging links in the QA Instructions section. Compute the hash from the branch name (same for all commits on the branch -- no network call needed):
-
-```bash
-HASH=$(git branch --show-current | tr -d '\n' | md5sum | awk '{print $1}')
-```
-
-**Serverless PRs** -- use judgement from the diff to classify:
-- **Serverless-only** (all changes are within the serverless product scope):
-  → `https://ddserverless-${HASH}.datadoghq.com/<inferred-path>`
-- **Cross-team** (serverless changes that also touch shared or non-serverless code):
-  → Both `https://ddserverless-${HASH}.datadoghq.com/<inferred-path>`
-    and `https://app-${HASH}.datadoghq.com/<inferred-path>`
-- If it's ambiguous whether a PR is serverless-only or cross-team, ask.
-
-Infer the path from the changed file paths (eg: `/serverless/aws/lambda?config_your-feature-flag=true`, `/serverless/settings`, `/integrations/amazon-web-services`, etc). Feature flags are set by the ?config_feature-flag-name=value URL param.
+After creating a PR (via `git cr` or `gt ss`), update the PR description using the `/pr-description` skill.
 
 ## Syncing
 ```bash
