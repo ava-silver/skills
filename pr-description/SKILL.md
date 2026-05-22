@@ -53,10 +53,10 @@ EOF
 
 ### Step 4: QA Links (UI PRs only)
 
-When the PR touches UI code, add clickable staging links to the QA Instructions section. Compute the hash from the branch name (no network call needed):
+When the PR touches UI code, add clickable staging links to the QA Instructions section. Compute the hash with the web-ui hash command:
 
 ```bash
-HASH=$(git branch --show-current | tr -d '\n' | md5sum | awk '{print $1}')
+HASH=$(yarn hash --hash-only)
 ```
 
 **Serverless PRs** -- classify from the diff:
