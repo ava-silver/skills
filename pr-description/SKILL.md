@@ -13,6 +13,7 @@ Updates a PR description based solely on what's in the diff -- not the conversat
 1. **Write as if from scratch.** Ignore the conversation history when composing the description. The description should reflect what's actually in the PR, not what was debated, explored, or considered along the way.
 2. **Source of truth is the diff.** If it's unclear what's in scope, re-fetch from GitHub (`gh pr view --json body,title,files`) or read the local branch diff (`git diff $(git main)...HEAD`).
 3. **No chat archaeology.** Don't carry over rejected ideas, alternative approaches, or intermediate decisions from the session.
+4. **Testing sections are for non-CI checks.** Assume build, lint, and unit tests are covered by pre-commit/CI. In any Test Plan, Testing, QA, or similar section, include only manual testing or QA steps that validate behavior beyond what CI already checks.
 
 ## Workflow
 
@@ -36,15 +37,14 @@ Fill in every section of the template. If there's no template, use a minimal Sum
 Base it only on:
 - The actual file changes in the diff
 - The Jira ticket (if one was provided by the user)
-- The PR template sections
+- The existing PR template sections
 
 ```bash
 gh pr edit --body "$(cat <<'EOF'
 ## Summary
 - ...
 
-## Test Plan
-- [ ] ...
+## ...
 EOF
 )"
 ```
