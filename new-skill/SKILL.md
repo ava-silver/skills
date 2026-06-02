@@ -38,7 +38,7 @@ allowed-tools: <only what the skill actually needs>
 <Concrete steps or constraints. Cut anything derivable from reading the code.>
 ```
 
-**Step 3: Install and verify**
+**Step 3: Reinstall**
 
 ```bash
 bunx skills add ~/skills -g -y -a claude-code
