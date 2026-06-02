@@ -1,14 +1,14 @@
 ---
 name: new-skill
-description: Create a new Claude Code skill. Use when the user says 'new skill', 'create skill', 'add skill', 'make a skill', or wants to define a new reusable slash command.
+description: Create a new Agent skill. Only use when directly invoked.
 allowed-tools: Read, Write, Edit, Bash
 ---
 
 # New Skill
 
-Creates a new Claude Code skill, checked into the skills repo and installed via `bunx skills`.
+Creates a new Agent skill, checked into the skills repo and installed via `bunx skills`.
 
-Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.claude/skills/`.
+Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.claude/skills/` or `~/.agent/skills/`.
 
 ## Principles for every skill
 
@@ -42,7 +42,6 @@ allowed-tools: <only what the skill actually needs>
 
 ```bash
 bunx skills add ~/skills -g -y -a claude-code
-ls -la ~/.claude/skills/<skill-name>/SKILL.md
 ```
 
 Tell the user the skill is ready and can be invoked with `/<skill-name>`.
