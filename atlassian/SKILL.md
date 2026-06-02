@@ -6,35 +6,28 @@ user_invocable: false
 
 # Atlassian
 
-## Setup
+**Cloud ID**: `66c05bee-f5ff-4718-b6fc-81351e5ef659` — use for all MCP tool calls.
 
-- **Cloud ID**: `66c05bee-f5ff-4718-b6fc-81351e5ef659` (Datadog Atlassian cloud) -- use this for all MCP tool calls
-
-## Creating SVLS Jira tickets
-
-### Defaults
+## SVLS Jira ticket defaults
 
 | Field | Value |
 |---|---|
 | Project | SVLS (`15505`) |
 | Issue type | Task (`10002`) |
-| Team - SVLS (`customfield_15831`) | Serverless Onboarding & Enablement (`22498`) |
-| Labels (`labels`) | `["Team - SVLS"]` |
+| Team (`customfield_15831`) | Serverless Onboarding & Enablement (`22498`) |
+| Labels | `["Team - SVLS"]` |
 | Priority | **Omit entirely** |
-| Assignee | Leave blank unless explicitly requested |
-| Parent (epic) | Always required -- ask if not provided |
+| Assignee | Leave blank unless requested |
+| Parent (epic) | Always required — ask if not provided |
 
-### Setting the parent (epic)
-
-Use the `parent` field (not `customfield_10014`):
-
+Parent syntax — use `parent`, not `customfield_10014`:
 ```json
 "parent": { "key": "SVLS-XXXX" }
 ```
 
-### Team - SVLS allowed values
+## Team IDs (`customfield_15831`)
 
-| Value | ID |
+| Team | ID |
 |---|---|
 | Agent | 19143 |
 | APM | 19141 |
@@ -49,18 +42,4 @@ Use the `parent` field (not `customfield_10014`):
 | Serverless Experiences | 22449 |
 | Serverless Onboarding & Enablement | 22498 |
 
-### Steps
-
-1. Parse user input for: summary, description, parent epic, and any overrides to the defaults above.
-2. If no epic is provided, ask before proceeding.
-3. Call `mcp__claude_ai_Atlassian__createJiraIssue` with:
-   - `cloudId`: `66c05bee-f5ff-4718-b6fc-81351e5ef659`
-   - `projectIdOrKey`: `"SVLS"`
-   - `issueTypeId`: `"10002"`
-   - `summary`: from user input
-   - `description`: from user input (if provided)
-   - `parent`: `{ "key": "<epic key>" }`
-   - `customfield_15831`: `{ "id": "22498" }` (or user-specified team ID)
-   - `labels`: `["Team - SVLS"]`
-   - Do NOT include `priority` or `assignee` unless explicitly requested
-4. Return the ticket key and link: `https://datadoghq.atlassian.net/browse/<KEY>`
+Return ticket URL: `https://datadoghq.atlassian.net/browse/<KEY>`

@@ -1,70 +1,47 @@
 ---
 name: new-skill
 description: Create a new Claude Code skill. Use when the user says 'new skill', 'create skill', 'add skill', 'make a skill', or wants to define a new reusable slash command.
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 # New Skill
 
 Creates a new Claude Code skill, checked into the skills repo and installed via `bunx skills`.
 
-## Convention
+Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.claude/skills/`.
 
-All skills are stored in `~/skills/<skill-name>/SKILL.md`. Never create skills directly in `~/.claude/skills/` — always check them into the repo.
+## Principles for every skill
+
+- **Relevant** -- it changes how the agent should behave in a specific context, not just restates obvious best practices.
+- **Non-obvious** -- it captures something an agent wouldn't discover from normal code exploration.
+- **Minimal** -- under 50 lines. A human should be able to read it in under a minute.
 
 ## Workflow
 
-### Step 1: Gather requirements
+**Step 1: Gather requirements** -- ask the user what the skill does, what to call it (kebab-case), what trigger phrases invoke it, and what tools it needs.
 
-Ask the user:
-- What should the skill do?
-- What should it be called? (kebab-case, e.g. `post-review`)
-- What trigger phrases should invoke it?
-- What tools does it need access to?
-
-### Step 2: Write the skill file
-
-Create `~/skills/<skill-name>/SKILL.md` with this structure:
+**Step 2: Write the skill file**
 
 ```markdown
 ---
 name: <skill-name>
-description: <One-line description. Include trigger phrases so Claude knows when to invoke it.>
-allowed-tools: <comma-separated list of tools the skill needs>
+description: <One-line description + trigger phrases so Claude knows when to invoke it.>
+allowed-tools: <only what the skill actually needs>
 ---
 
-# <Skill Title>
+# <Title>
 
-<Brief description of what the skill does.>
+<What it does, in 1-2 sentences.>
 
-## Key Rules
+## Key Rules / Workflow
 
-<Numbered list of important constraints or behaviors.>
-
-## Workflow
-
-### Step 1: ...
-### Step 2: ...
+<Concrete steps or constraints. Cut anything derivable from reading the code.>
 ```
 
-Guidelines for the skill file:
-- The `description` field is critical — it controls when Claude auto-invokes the skill. Include explicit trigger phrases.
-- `allowed-tools` should be minimal — only what the skill actually needs.
-- Workflow steps should be concrete and actionable, not vague.
-- Include example commands/payloads where relevant.
-
-### Step 3: Install the skill
+**Step 3: Install and verify**
 
 ```bash
-bunx skills add ~/skills -g -y
-```
-
-This re-runs on the whole directory (idempotent) and installs all skills to both `~/.claude/skills/` and `~/.codex/skills/`.
-
-### Step 4: Verify
-
-Confirm the skill is installed:
-```bash
+bunx skills add ~/skills -g -y -a claude-code
 ls -la ~/.claude/skills/<skill-name>/SKILL.md
 ```
 

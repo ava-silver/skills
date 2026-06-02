@@ -1,74 +1,47 @@
 ---
 name: git-workflow
-description: Ava's git/Graphite (gt) workflow at Datadog. Load BEFORE any git, gt, or gh pr command — including git commit, git push, git ac, git cr, gt ss, gt s, gt submit, creating branches, opening PRs, syncing, or worktrees. Contains required aliases (git cr, git ac, gt ss --no-edit -q), branch naming (ava.silver/TICKET/desc), and the rule to never use git push.
+description: Ava's git/Graphite (gt) workflow at Datadog. Load BEFORE any git, gt, or gh pr command -- including git commit, git push, git ac, git cr, gt ss, gt s, gt submit, creating branches, opening PRs, syncing, or worktrees. Contains required aliases (git cr, git ac, gt ss --no-edit -q), branch naming (ava.silver/TICKET/desc), and the rule to never use git push.
 user_invocable: false
 ---
 
 # Git Workflow
 
-All repos use **Graphite (`gt`)** for stacked PRs. Most git operations should go through custom aliases that auto-format branches and commit messages.
+All repos use **Graphite (`gt`)** for stacked PRs.
 
 ## Branch naming
-Branches follow: `ava.silver/{TICKET}/{short-description}`
-- Ticket is lowercase: `ava.silver/svls-1234/fix-timeout`
-- Chore/no-ticket work: `ava.silver/chore/{description}`
-- Graphite sets the `ava.silver/` prefix automatically
+`ava.silver/{ticket}/{short-description}` — e.g. `ava.silver/svls-1234/fix-timeout`
+Chore/no-ticket: `ava.silver/chore/{description}`
 
-## Starting work (branch + PR in one shot)
+## Starting work — branch + first commit + PR in one shot
 ```bash
 git cr svls-1234 short description here
+# → creates branch, stages all, commits [SVLS-1234] short description here, opens PR
+# chore: git cr chore short description → commit "chore: short description"
 ```
-- Stages ALL uncommitted changes, creates the branch, commits, and opens a PR
-- Also works when you need to create a new branch first -- just run `git cr ...` directly, it handles branch creation
-- Message becomes: `[SVLS-1234] short description here`
-- Chore: `git cr chore short description` → branch `ava.silver/chore/short-description`, message `chore: short description`
 
-**Already on a branch (e.g. in a worktree)?** If the changes are already on a named branch with no commits yet (worktrees are typically set up this way), skip `git cr` -- just commit and push normally:
+**Already on a branch** (e.g. in a worktree with no commits yet): skip `git cr`:
 ```bash
 git ac short description here
 gt ss --no-edit -q
 ```
-Then fill out the PR description as described below.
 
 ## Adding commits
 ```bash
-git ac short description here
+git ac short description here   # stages all + commits (does NOT push)
+gt ss --no-edit -q              # push + create/update PR(s) in the stack
 ```
-- Stages all + commits. Does NOT push.
-- `commit.sh` auto-prepends the ticket from the branch name: `[SVLS-1234] short description`
-- To push after: `gt ss --no-edit -q`
 
-## Pushing / submitting PRs
-```bash
-gt ss --no-edit -q   # submit full stack, no interactive prompts, minimal/no ouput 
-```
-- **Never use `git push`** -- always use `gt ss` so Graphite manages the stack and PRs correctly
-- `gt ss` = `gt submit --stack` -- pushes all branches in the stack (ancestors + descendants), creating/updating PRs for each
-- Uses `--force-with-lease` by default (safe to run repeatedly)
-- `--no-edit -q` skips interactive PR metadata prompts and minimizes output
+`git ac` auto-prepends the ticket from the branch name: `[SVLS-1234] short description`.
 
-## Creating PRs
-After creating a PR (via `git cr` or `gt ss`), update the PR description using the `/pr-description` skill.
-
-## Syncing
-```bash
-gt s    # sync branch from origin, never overwrites local changes
-```
-Prefer over `git pull` directly.
+## Key rules
+- **Never use `git push`** — always use `gt ss --no-edit -q`
+- Use `gt s` instead of `git pull` to sync
+- After creating a PR, update the description with `/pr-description`
+- Do not add Claude as a co-author to any commit
 
 ## Worktrees
-Worktrees live at `~/dd/{repo-name}.worktrees/{branch-name}/` (slashes in branch names replaced with `-`).
-
-To create one manually:
+Live at `~/dd/{repo-name}.worktrees/{branch-name}/` (slashes → `-`).
 ```bash
 git worktree add ~/dd/{repo}.worktrees/{branch} {branch}
 git checkout $(git main)
 ```
-Note: the `wt` shell function does this + `cd`s into the worktree, but it's a shell function not available to Claude. Use the above directly.
-
-## Key rules
-- Prefer `gt` commands for everything except `git cr` and `git ac`
-- Prefer `git ac` over `git commit` directly, but manual `git commit` is fine — if used, run `gt track` afterwards so Graphite can manage the branch
-- **Never use `git push`** -- always use `gt ss --no-edit -q` to push and submit PRs
-- Prefer `gt s` over `git pull`
-- Do not add Claude as a co-author to any commit
