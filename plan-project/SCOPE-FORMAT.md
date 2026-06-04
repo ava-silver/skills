@@ -1,11 +1,28 @@
-# <Project Name> — Scoping
+> Template for `SCOPE.md`. Keep sections that apply; drop ones that don't.
+> This document is for sharing with stakeholders — do not reference local files or
+> internal agent artifacts. For any doc in Prior Reading without a link, use
+> `[LINK NEEDED]` as a placeholder (or ask the user for the URL before writing).
+>
+> **Writing style:** this should read as human-written prose. Avoid random bolding,
+> em-dashes, semicolons, and other awkward phrasing of text that read as AI-generated.
+> When using lists, keep them well-structured and easy to read.
 
-> Template for `SCOPE.md`. Keep sections that apply; drop ones that don't. Link back
-> to concepts in `CONTEXT.md` and to RFC sections so vocabulary stays consistent.
+---
 
+# <Project Name>: Scoping
+
+## TLDR
+
+2-3 bullets max. Hyper short, very high level — what are we conceptually implementing?
+- ...
 
 ## Prior Reading
-Links: RFC/design doc, Figma, related PRs, prior examples, relevant docs. Keep this minimal to what is actually needed for understanding the scope.
+
+Links a reader needs before evaluating the scope. Keep this minimal.
+
+- RFC/design doc: [LINK NEEDED]
+- Figma designs: [LINK NEEDED]
+- _(add or remove entries as needed)_
 
 ## Goal
 
@@ -13,8 +30,11 @@ One or two sentences: what this project delivers and why.
 
 ## Background
 
-Context a reader needs to evaluate the scope — prior work, existing systems/frameworks
+Context a reader needs to evaluate the scope, such as prior work, existing systems/frameworks
 being built on, and any in-flight efforts that do or don't block this. Link sources.
+
+**Omit this section** if there's a linked RFC/design doc in Prior Reading — readers can follow
+the link for background.
 
 ## In Scope
 
@@ -27,21 +47,23 @@ and reference the code/areas they touch.
 **Tasks:**
 1. ...
 2. ...
-*Depends on: <other milestone, or none>.*
 
 ### Milestone 2: <name>
 ...
 
+## Ordering / Dependencies
+
+What blocks what, and in what order things must land. Centralize all sequencing here rather
+than scattering it across milestones. A Mermaid graph is recommended when the dependency
+structure is non-trivial; a prose or bullet list is fine for simpler cases.
+
+- **Internal:** dependencies between milestones or tasks within this plan (e.g. "M2 is gated on M1.3").
+- **External:** prerequisites owned by other teams or systems, with status if known.
+
 ## Out of Scope
 
-Work explicitly **not** being planned here, and why (deferred, owned by another team,
-deprecated, etc.). Being explicit here prevents scope creep during planning.
-
-## Hard Dependencies
-
-Blocking prerequisites — work that must land before (parts of) this can proceed.
-Note whether each is internal to this plan or external (another team/system), and
-its status if known.
+Work explicitly excluded that isn't already ruled out by the RFC/design doc — things a reader
+might reasonably expect to be in scope. Being explicit here prevents scope creep during planning.
 
 ## Observability / Success Metrics
 
@@ -57,10 +79,21 @@ Operational burden after rollout:
   only if there are cross-team ownership considerations.
 - **Operational:** alerting, runbooks, on-call impact, recurring upkeep.
 
+## Documentation
+
+What needs writing so others can use/operate this, and who's the audience:
+- **Docs:** user-facing docs, internal runbooks, READMEs, API reference — whatever the
+  work obligates. Note where they live.
+- **Blogpost (optional):** if the work warrants external/internal announcement, scope a
+  blogpost as a deliverable (audience, key message, owner).
+
 ## Rollout (optional)
 
-Keep minimal or omit if not relevant: feature-flag strategy, staged rollout / cohorts,
-rollback plan.
+Keep minimal or omit if not relevant:
+- **Feature flags:** consider a flag for anything public/customer-facing — any change to
+  observable behavior (UI, APIs, backend behavior) — so it can be shipped dark, tested,
+  and rolled back without a revert. Note the flag(s) and gating.
+- Staged rollout / cohorts and rollback plan, where relevant.
 
 ## Open Questions
 
