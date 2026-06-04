@@ -13,7 +13,7 @@
 
 ## TLDR
 
-2-3 bullets max. Hyper short, very high level — what are we conceptually implementing?
+Leave blank and ask the user to fill this in. 2-3 bullets, one line each.
 - ...
 
 ## Prior Reading
@@ -59,8 +59,15 @@ not individual tasks. A graph is recommended when the milestone structure is non
 prose or bullet list is fine for simpler cases. Task-level dependencies (e.g. "M2 is gated
 on M1.3") belong in the Internal/External bullets below, not the graph.
 
+For a graph: write it to `dependencies.mmd`, render it with
+`bunx mmdc -i dependencies.mmd -o dependencies.png -b transparent`,
+then embed the PNG here with `![](dependencies.png)`. (Fall back to npx if bunx is not available.)
+
+Only include work that hasn't been done yet or features that haven't been released. Reviews,
+coordination, and approvals from other teams are not dependencies.
+
 - **Internal:** dependencies between milestones or tasks within this plan (e.g. "M2 is gated on M1.3").
-- **External:** prerequisites owned by other teams or systems, with status if known.
+- **External:** incomplete work or unreleased features owned by other teams or systems, with status if known.
 
 ## Out of Scope
 
