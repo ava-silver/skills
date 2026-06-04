@@ -10,12 +10,6 @@ Creates a new Agent skill, checked into the skills repo and installed via `bunx 
 
 Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.claude/skills/` or `~/.agent/skills/`.
 
-## Principles for every skill
-
-- **Relevant** -- it changes how the agent should behave in a specific context, not just restates obvious best practices.
-- **Non-obvious** -- it captures something an agent wouldn't discover from normal code exploration.
-- **Minimal** -- under 50 lines. A human should be able to read it in under a minute.
-
 ## Workflow
 
 **Step 1: Gather requirements** -- ask the user what the skill does, what to call it (kebab-case), what trigger phrases invoke it, and what tools it needs.
