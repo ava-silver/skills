@@ -38,6 +38,8 @@ Invoke `grill-me` again (with `CONTEXT.md`) to nail down what's **explicitly in 
 
 Follow the structure in `SCOPE-FORMAT.md` (bundled alongside this skill). `SCOPE.md` is for stakeholder sharing — do not reference local files or `CONTEXT.md` in it. For any Prior Reading entry without a URL, use `[LINK NEEDED]` or ask the user for the link before writing.
 
+After drafting the Ordering/Dependencies section, check for **uneven dependencies within a milestone** — if some tasks are blocked and others aren't, that milestone probably needs splitting so the dependency boundaries are clean. Flag these and propose a split before proceeding.
+
 Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scoping issues before tickets exist): run `pbcopy < SCOPE.md` and tell the user it's already on their clipboard, ready to "Paste from Markdown" into a Google Doc. Don't block — let the user say proceed.
 
 ## Phase 3 — Planning → `TICKETS.md`

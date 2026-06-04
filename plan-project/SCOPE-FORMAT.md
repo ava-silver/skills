@@ -54,8 +54,10 @@ and reference the code/areas they touch.
 ## Ordering / Dependencies
 
 What blocks what, and in what order things must land. Centralize all sequencing here rather
-than scattering it across milestones. A Mermaid graph is recommended when the dependency
-structure is non-trivial; a prose or bullet list is fine for simpler cases.
+than scattering it across milestones. Keep any Mermaid graph at the milestone level -- show how milestones gate each other,
+not individual tasks. A graph is recommended when the milestone structure is non-trivial. A
+prose or bullet list is fine for simpler cases. Task-level dependencies (e.g. "M2 is gated
+on M1.3") belong in the Internal/External bullets below, not the graph.
 
 - **Internal:** dependencies between milestones or tasks within this plan (e.g. "M2 is gated on M1.3").
 - **External:** prerequisites owned by other teams or systems, with status if known.
@@ -94,8 +96,3 @@ Keep minimal or omit if not relevant:
   observable behavior (UI, APIs, backend behavior) — so it can be shipped dark, tested,
   and rolled back without a revert. Note the flag(s) and gating.
 - Staged rollout / cohorts and rollback plan, where relevant.
-
-## Open Questions
-
-Unresolved decisions, each with current leaning or who needs to decide. Resolve or
-explicitly defer these before planning tickets.
