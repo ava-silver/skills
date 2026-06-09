@@ -35,6 +35,10 @@ EOF
 )"
 ```
 
+## Diagrams
+
+If the changes involve a non-obvious flow (e.g. a new state machine, multi-service interaction, or complex branching logic), add a Mermaid diagram using the `diagram` skill. GitHub renders Mermaid natively in PR descriptions -- output as an inline fenced block, no file needed. Only add a diagram when it meaningfully aids understanding; don't add one just to have one.
+
 ## QA links (UI PRs only)
 
 ```bash

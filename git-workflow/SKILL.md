@@ -25,6 +25,19 @@ git ac short description here
 gt ss --no-edit -q
 ```
 
+## Stacked (child) PRs — default path
+**Always use `git cr` from the parent branch.** Do NOT reach for `gt create` — it is not part of this workflow.
+
+```bash
+# On parent branch ava.silver/svls-1234/parent-work:
+git cr svls-1235 child description here
+# → creates ava.silver/svls-1235/child-description-here off the current branch,
+#    stages all, commits, opens a child PR stacked on the parent
+gt ss --no-edit -q   # pushes the full stack
+```
+
+`gt create` is not the default. Only use it if `git cr` cannot achieve the desired branch shape, and document why.
+
 ## Adding commits
 ```bash
 git ac short description here   # stages all + commits (does NOT push)
