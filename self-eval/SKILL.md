@@ -1,6 +1,6 @@
 ---
 name: self-eval
-description: Guide the user through writing their periodic performance self-evaluation. Triggers: "self-eval", "write my self-eval", "self evaluation", "perf review write-up".
+description: 'Guide the user through writing their periodic performance self-evaluation. Triggers: "self-eval", "write my self-eval", "self evaluation", "perf review write-up".'
 allowed-tools: AskUserQuestion, Write, Read, Bash, WebFetch, mcp__plugin_atlassian_atlassian__searchJiraIssuesUsingJql, mcp__plugin_atlassian_atlassian__getJiraIssue, mcp__plugin_slack_slack__slack_search_public_and_private
 ---
 

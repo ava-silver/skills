@@ -16,10 +16,12 @@ Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.cla
 
 **Step 2: Write the skill file**
 
+> **YAML gotcha:** If the description contains `: ` (colon-space), wrap it in single quotes — otherwise the YAML parser treats it as a mapping key and the skill is silently skipped by `bunx skills add`. Trigger phrase lists like `Triggers: "foo", "bar"` are the common culprit.
+
 ```markdown
 ---
 name: <skill-name>
-description: <One-line description + trigger phrases so Claude knows when to invoke it.>
+description: '<One-line description + trigger phrases so Claude knows when to invoke it.>'
 allowed-tools: <only what the skill actually needs>
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: diagram
-description: Create a Mermaid diagram (.mmd) and render it to an image. Use when the user wants to visualize a flow, architecture, sequence, state machine, ER diagram, or any structured relationship. Trigger phrases: "make a diagram", "draw this", "diagram this", "visualize", "flowchart", "sequence diagram", "architecture diagram", "mermaid".
-allowed-tools: Bash, Read, Write, Edit
+description: 'Create a Mermaid diagram (.mmd) and render it to an image. Use when the user wants to visualize a flow, architecture, sequence, state machine, ER diagram, or any structured relationship. Trigger phrases: "make a diagram", "draw this", "diagram this", "visualize", "flowchart", "sequence diagram", "architecture diagram", "mermaid".'
 ---
 
 # Diagram
