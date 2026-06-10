@@ -44,10 +44,13 @@ Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scop
 
 ## Phase 3 — Planning → `TICKETS.md`
 
+**North star:** every ticket should be ready to develop on — no open questions, no unclear or ambiguous parts. If a ticket still has unknowns, resolve them with the user (or capture an explicit spike) before considering it done.
+
 1. List the tickets implied by `SCOPE.md`. A task in the scoping doc doesn't map 1:1 to a ticket — carefully consider whether each task should be one ticket or several. The target is roughly a couple days of engineering time and a single conceptual task per ticket. Flag anything that looks too big or too small, and offer to split or consolidate. If a scaffolding ticket (shared types, base components, infra setup) would make downstream tickets more parallelizable, propose one. Iterate until they approve the split.
 2. Write the drafts to `TICKETS.md`, each separated by `---`, numbered from `1` (no real keys yet), following the structure in `TICKETS-FORMAT.md` (bundled alongside this skill).
 3. For each dependency, confirm it's **hard** (blocking) vs. soft (conceptual) — check the doc/context, ask the user if unclear. Only hard deps go in the template.
-4. Have the user thoroughly review; iterate until they say it's ready to upload.
+4. After writing the initial draft, generate a Mermaid diagram (invoke the `diagram` skill) showing the tickets as a dependency graph -- render with a **white background** (`-b white`). Keep the diagram in sync: any time `TICKETS.md` changes, regenerate it. The diagram makes ticket structure and blocking relationships much easier to review during back-and-forth.
+5. Have the user thoroughly review; iterate until they say it's ready to upload.
 
 ## Phase 4 — Upload
 
