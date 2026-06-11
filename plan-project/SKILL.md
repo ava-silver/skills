@@ -46,7 +46,7 @@ Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scop
 
 **North star:** every ticket should be ready to develop on — no open questions, no unclear or ambiguous parts. If a ticket still has unknowns, resolve them with the user (or capture an explicit spike) before considering it done.
 
-**Always name, never just number:** whenever you refer to a ticket or milestone (here and in Phase 2), pair the number with a short name (e.g. "Ticket 3 (auth middleware)", "Milestone 2 (rollout)"). Bare numbers are easy to confuse.
+**Always name, never just number:** whenever you refer to a ticket or milestone in chat (here and in Phase 2), lead with its short name, not a bare number (e.g. "the auth middleware ticket", "the rollout milestone"). Bare numbers are easy to confuse. **Inside `TICKETS.md`**, every cross-reference to another ticket — prose and `### Dependencies` alike — uses the `[[TN]]` token (e.g. `[[T3]] (auth middleware)`), per `TICKETS-FORMAT.md`. This is what makes the Phase 4 key-substitution a clean find/replace.
 
 1. List the tickets implied by `SCOPE.md`. A task in the scoping doc doesn't map 1:1 to a ticket — carefully consider whether each task should be one ticket or several. The target is roughly a couple days of engineering time and a single conceptual task per ticket. Flag anything that looks too big or too small, and offer to split or consolidate. If a scaffolding ticket (shared types, base components, infra setup) would make downstream tickets more parallelizable, propose one. Iterate until they approve the split.
 2. Write the drafts to `TICKETS.md`, each separated by `---`, numbered from `1` (no real keys yet), following the structure in `TICKETS-FORMAT.md` (bundled alongside this skill).
@@ -65,5 +65,8 @@ mq '.p' TICKETS.md | grep -A1 "^Dependencies$"        # all dep values, paired w
 ```
 
 - Create every ticket under the **epic from Phase 0** (`parent: { key }`), defaulting to issue type **Task** per the `atlassian` skill; override per-ticket only if explicitly flagged as a Bug/Story. Everything except dependencies maps into the description; the Summary becomes the Jira title.
-- **Do not** put dependencies in the description. After all tickets exist, create Jira issue links of type **"Blocks"** (ticket B "is blocked by" A). Print the full planned link list for confirmation before creating any links.
-- Write the **real keys back into `TICKETS.md`** (annotate each `## N.` with its `SVLS-XXXX`) so re-runs don't double-create.
+- **Do not** put dependencies in the description. After all tickets exist, create Jira issue links of type **"Blocks"** (ticket B "is blocked by" A). The `### Dependencies` token list (`[[T2]], [[T4]]`) gives B's blockers directly. Print the full planned link list for confirmation before creating any links.
+- Write the **real keys back into `TICKETS.md`**:
+  1. Annotate each `## N.` heading with its key — `## 3. [SVLS-1234] Title` — so re-runs don't double-create. This is the lookup table.
+  2. For each ticket, find/replace every `[[TN]]` token across the file with `[SVLS-XXXX](https://<domain>/browse/SVLS-XXXX)` (use the real Jira domain from the `atlassian` skill). One replace per ticket; the token's rigid shape makes it safe.
+  3. Verify no token survived: `rg '\[\[T\d+\]\]' TICKETS.md` must return nothing. A leftover token means a reference never got linked.
