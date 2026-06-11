@@ -50,13 +50,19 @@ Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scop
 
 1. List the tickets implied by `SCOPE.md`. A task in the scoping doc doesn't map 1:1 to a ticket — carefully consider whether each task should be one ticket or several. The target is roughly a couple days of engineering time and a single conceptual task per ticket. Flag anything that looks too big or too small, and offer to split or consolidate. If a scaffolding ticket (shared types, base components, infra setup) would make downstream tickets more parallelizable, propose one. Iterate until they approve the split.
 2. Write the drafts to `TICKETS.md`, each separated by `---`, numbered from `1` (no real keys yet), following the structure in `TICKETS-FORMAT.md` (bundled alongside this skill).
-3. For each dependency, confirm it's **hard** (blocking) vs. soft (conceptual) — check the doc/context, ask the user if unclear. Only hard deps go in the template. Remove transitive redundancies: if A → B → C and A → C, the A → C link is implied and should be dropped.
+3. For each dependency, confirm it's **hard** (blocking) vs. soft (conceptual) — check the doc/context, ask the user if unclear. Only hard deps go in the `### Dependencies` section. Remove transitive redundancies: if A → B → C and A → C, the A → C link is implied and should be dropped.
 4. After writing the initial draft, generate a Mermaid diagram (invoke the `diagram` skill) showing the tickets as a dependency graph -- render with a **white background** (`-b white`). Keep the diagram in sync: any time `TICKETS.md` changes, regenerate it. The diagram makes ticket structure and blocking relationships much easier to review during back-and-forth.
-5. Have the user thoroughly review; iterate until they say it's ready to upload. Tickets are always appended with the next incrementing number — never reorder existing numbers or use suffixes like `8b`. The order in `TICKETS.md` is the order they'll be created in Jira, so place new tickets where they logically belong (milestone grouping or dependency order) as you add them.
+5. Have the user thoroughly review; iterate until they say it's ready to upload. Tickets are always appended with the next incrementing number. The order in `TICKETS.md` is the order they'll be created in Jira, so place new tickets where they logically belong (milestone grouping or dependency order) as you add them.
 
 ## Phase 4 — Upload
 
 Before creating anything, run a **self-containment check** — each ticket must make sense without the reader having to open the RFC or scoping doc. Scan for bare references like "see the RFC" or "as described in SCOPE.md" and replace them with the actual context inline. If a genuine external reference is needed (design doc, Confluence page, Google Doc), link directly to the hosted URL — never reference a local file path.
+
+Use these commands to parse `TICKETS.md` during upload:
+```bash
+mq '.h2' TICKETS.md                                    # ordered list of tickets to create
+mq '.p' TICKETS.md | grep -A1 "^Dependencies$"        # all dep values, paired with ticket order
+```
 
 - Create every ticket under the **epic from Phase 0** (`parent: { key }`), defaulting to issue type **Task** per the `atlassian` skill; override per-ticket only if explicitly flagged as a Bug/Story. Everything except dependencies maps into the description; the Summary becomes the Jira title.
 - **Do not** put dependencies in the description. After all tickets exist, create Jira issue links of type **"Blocks"** (ticket B "is blocked by" A). Print the full planned link list for confirmation before creating any links.

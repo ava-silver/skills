@@ -26,8 +26,9 @@ enough that someone can pick it up cold without reading the RFC.
 
 **Caveats / notes:** (optional) edge cases, gotchas, non-obvious decisions. Omit if there's nothing genuinely surprising — don't restate dependencies or context already captured above.
 
-**Hard dependencies:** Ticket #X (blocking only — omit soft/conceptual deps; these
-become Jira "Blocks" links at upload, not description text).
+### Dependencies
+Ticket #X, Ticket #Y (or `none`; blocking only — omit soft/conceptual deps; these
+become Jira "Blocks" links at upload, not description text)
 
 ---
 
