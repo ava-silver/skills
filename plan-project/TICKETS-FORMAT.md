@@ -18,7 +18,7 @@ background directly — do not reference local files or milestone markers. If an
 doc is needed, link to its hosted URL (e.g. Google Doc, Confluence). Self-contained
 enough that someone can pick it up cold without reading the RFC.
 
-**Code links:** relevant files/dirs, `file:line` where known.
+**Code links:** (optional) GitHub links to relevant packages, files, or specific lines. Omit if not applicable.
 
 **Acceptance criteria:**
 - [ ] concrete, checkable outcome
