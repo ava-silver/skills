@@ -46,13 +46,19 @@ Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scop
 
 **North star:** every ticket should be ready to develop on — no open questions, no unclear or ambiguous parts. If a ticket still has unknowns, resolve them with the user (or capture an explicit spike) before considering it done.
 
+**Always name, never just number:** whenever you refer to a ticket or milestone (here and in Phase 2), pair the number with a short name (e.g. "Ticket 3 (auth middleware)", "Milestone 2 (rollout)"). Bare numbers are easy to confuse.
+
 1. List the tickets implied by `SCOPE.md`. A task in the scoping doc doesn't map 1:1 to a ticket — carefully consider whether each task should be one ticket or several. The target is roughly a couple days of engineering time and a single conceptual task per ticket. Flag anything that looks too big or too small, and offer to split or consolidate. If a scaffolding ticket (shared types, base components, infra setup) would make downstream tickets more parallelizable, propose one. Iterate until they approve the split.
 2. Write the drafts to `TICKETS.md`, each separated by `---`, numbered from `1` (no real keys yet), following the structure in `TICKETS-FORMAT.md` (bundled alongside this skill).
-3. For each dependency, confirm it's **hard** (blocking) vs. soft (conceptual) — check the doc/context, ask the user if unclear. Only hard deps go in the template.
+3. For each dependency, confirm it's **hard** (blocking) vs. soft (conceptual) — check the doc/context, ask the user if unclear. Only hard deps go in the template. Remove transitive redundancies: if A → B → C and A → C, the A → C link is implied and should be dropped.
 4. After writing the initial draft, generate a Mermaid diagram (invoke the `diagram` skill) showing the tickets as a dependency graph -- render with a **white background** (`-b white`). Keep the diagram in sync: any time `TICKETS.md` changes, regenerate it. The diagram makes ticket structure and blocking relationships much easier to review during back-and-forth.
-5. Have the user thoroughly review; iterate until they say it's ready to upload.
+5. Have the user thoroughly review; iterate until they say it's ready to upload. No need to reorder tickets during back-and-forth -- new tickets can be inserted as `8b`, `8c`, etc. rather than appended to the end. Before upload, reorder everything to match milestone grouping (or another reasonable ordering) so the Jira backlog reads in a logical sequence.
 
 ## Phase 4 — Upload
+
+Before creating anything, run two pre-upload checks:
+1. **Ordering** — reorder tickets to match milestone grouping (or another logical sequence). Confirm the order looks reasonable before proceeding.
+2. **Self-containment** — each ticket must make sense without the reader having to open the RFC or scoping doc. Scan for bare references like "see the RFC" or "as described in SCOPE.md" and replace them with the actual context inline. If a genuine external reference is needed (design doc, Confluence page, Google Doc), link directly to the hosted URL — never reference a local file path.
 
 - Create every ticket under the **epic from Phase 0** (`parent: { key }`), defaulting to issue type **Task** per the `atlassian` skill; override per-ticket only if explicitly flagged as a Bug/Story. Everything except dependencies maps into the description; the Summary becomes the Jira title.
 - **Do not** put dependencies in the description. After all tickets exist, create Jira issue links of type **"Blocks"** (ticket B "is blocked by" A). Print the full planned link list for confirmation before creating any links.
