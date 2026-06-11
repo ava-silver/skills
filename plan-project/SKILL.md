@@ -17,7 +17,7 @@ Ask for (or use provided): context path/link, RFC/design doc, target epic key.
 - Google Docs can't be fetched — ask the user to "Download as Markdown" and provide the file.
 - **Fetch the epic via Jira and confirm its summary back** before proceeding; bail if the key doesn't resolve.
 
-`grill-me` is required for phases 1–2. Check `~/.claude/skills/grill-me/SKILL.md` (or agent equivalent); if missing, install: `bunx skills add https://github.com/mattpocock/skills -g -y -a claude-code` (fall back to `npx` if `bunx` isn't on PATH).
+`grill-me` is required for phases 1–2. Check `~/.claude/skills/grill-me/SKILL.md` (or agent equivalent); if missing, install: `npx -y skills@latest add https://github.com/mattpocock/skills -g -y -a claude-code -s grill-me`.
 
 ## Phase 1 — Context → `CONTEXT.md`
 
