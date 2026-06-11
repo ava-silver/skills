@@ -58,7 +58,7 @@ Then **soft-nudge** sharing with stakeholders/PMs/EMs (it's easier to catch scop
 
 Before creating anything, run a **self-containment check** — each ticket must make sense without the reader having to open the RFC or scoping doc. Scan for bare references like "see the RFC" or "as described in SCOPE.md" and replace them with the actual context inline. If a genuine external reference is needed (design doc, Confluence page, Google Doc), link directly to the hosted URL — never reference a local file path.
 
-Use these commands to parse `TICKETS.md` during upload:
+Parsing `TICKETS.md` relies on `mq`. Ensure it's installed first: `command -v mq || brew install mq`. Then:
 ```bash
 mq '.h2' TICKETS.md                                    # ordered list of tickets to create
 mq '.p' TICKETS.md | grep -A1 "^Dependencies$"        # all dep values, paired with ticket order
