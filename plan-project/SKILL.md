@@ -65,6 +65,7 @@ mq '.p' TICKETS.md | grep -A1 "^Dependencies$"        # all dep values, paired w
 ```
 
 - Create every ticket under the **epic from Phase 0** (`parent: { key }`), defaulting to issue type **Task** per the `atlassian` skill; override per-ticket only if explicitly flagged as a Bug/Story. Everything except dependencies maps into the description; the Summary becomes the Jira title.
+- Create the tickets in sequential order, so that the epic order matches `TICKETS.md`.
 - **Do not** put dependencies in the description. After all tickets exist, create Jira issue links of type **"Blocks"** (ticket B "is blocked by" A). The `### Dependencies` token list (`[[T2]], [[T4]]`) gives B's blockers directly. Print the full planned link list for confirmation before creating any links.
 - Write the **real keys back into `TICKETS.md`**:
   1. Annotate each `## N.` heading with its key — `## 3. [SVLS-1234] Title` — so re-runs don't double-create. This is the lookup table.
