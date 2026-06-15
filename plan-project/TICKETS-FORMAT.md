@@ -1,28 +1,40 @@
 # <Project Name> — Tickets
 
-> Template for `TICKETS.md`. One ticket per block, separated by `---`, numbered from `1`
-> (no real keys until upload). Each ticket must be self-contained — no bare references to
+> Template for `TICKETS.md`. One ticket per block, separated by `---`, each headed by its
+> `[[TN]]` token numbered from `1` (no real keys until upload). Each ticket must be self-contained — no bare references to
 > local files, milestone markers (e.g. `M1.1`), or `SCOPE.md`/`CONTEXT.md` sections.
 > Inline the relevant context directly; if an external doc (RFC, Confluence, Google Doc)
 > is genuinely needed, link to its hosted URL.
 
-## Cross-references — the `[[TN]]` token
+## Titling tickets
 
-Every reference to another ticket in this file — in prose **and** in `### Dependencies` —
-uses the token `[[TN]]`, where `N` is the ticket's `## N.` number (e.g. `[[T3]]`). This is
-the only form allowed; never write bare `Ticket 3`, `Ticket #3`, or `M1.2`. The `## N.`
-heading is the lookup table: `## 3.` defines what `[[T3]]` points at.
+The h2 heading becomes the Jira summary. Make each one:
+
+- **Verb-led** -- start with an imperative verb (`Add`, `Migrate`, `Remove`, `Refactor`) so the title reads as work to do, not a topic area. Never a noun-only title like "Auth" or "Rate limiting".
+- **Outcome over activity** -- name the result, not the effort. "Add rate limiting to login endpoint", not "Investigate rate limiting" or "Work on auth".
+- **Self-contained** -- legible without the epic or sibling tickets. Spell out the subject; a reader scanning the backlog should know what it touches without opening it.
+- **Specific enough to disambiguate** -- the title alone must distinguish it from its siblings. If two tickets could share a title, both are too vague.
+- **One PR's worth** -- describe a single unit of work at the granularity of one merge, not a milestone ("Phase 2") or a sub-task ("fix typo in handler").
+- **Parallel phrasing across siblings** -- tickets under one epic share grammatical shape (all `Verb + object`) so the set reads as a coherent plan.
+
+## Cross-references
+
+Every ticket is identified by the token `[[TN]]` — used in its `##` heading **and** in
+every reference to it, in prose and in `### Dependencies`. `N` numbers the tickets from
+`1` in order (e.g. `[[T3]]`). This is the only form allowed; never write a bare `Ticket 3`,
+`Ticket #3`, `M1.2`, or a plain `## 3.` number. The heading is the lookup table: `## [[T3]]`
+defines what every `[[T3]]` reference points at.
 
 - Keep pairing the token with the name (per the skill's naming rule): `[[T3]] (auth middleware)`.
   The token is the substitution target; the `(name)` stays put for readability.
-- After upload, annotate each `## N.` heading with its real key — `## 3. [SVLS-1234] Title` —
-  so re-runs don't double-create, then find/replace every `[[T3]]` →
+- After upload, replace each heading's token with its real key — `## [SVLS-1234] Title` —
+  so re-runs don't double-create, then find/replace every remaining `[[T3]]` →
   `[SVLS-1234](https://<domain>/browse/SVLS-1234)`. One replace per ticket; the token's
   rigid shape makes this safe. `rg '\[\[T\d+\]\]' TICKETS.md` must come back empty afterward.
 
 ---
 
-## 1. <Title>
+## [[T1]] <Title>
 
 **Summary:** one-liner of the work (becomes the Jira title).
 
@@ -45,7 +57,7 @@ enough that someone can pick it up cold without reading the RFC.
 
 ---
 
-## 2. <Title>
+## [[T2]] <Title>
 
 **Summary:** ...
 
