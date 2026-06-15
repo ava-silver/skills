@@ -10,12 +10,11 @@
 
 The h2 heading becomes the Jira summary. Make each one:
 
-- **Verb-led** -- start with an imperative verb (`Add`, `Migrate`, `Remove`, `Refactor`) so the title reads as work to do, not a topic area. Never a noun-only title like "Auth" or "Rate limiting".
-- **Outcome over activity** -- name the result, not the effort. "Add rate limiting to login endpoint", not "Investigate rate limiting" or "Work on auth".
+- **Outcome over activity** -- name the result, not the effort. "Rate limiting in login endpoint", not "Investigate rate limiting" or "Work on auth".
 - **Self-contained** -- legible without the epic or sibling tickets. Spell out the subject; a reader scanning the backlog should know what it touches without opening it.
 - **Specific enough to disambiguate** -- the title alone must distinguish it from its siblings. If two tickets could share a title, both are too vague.
 - **One PR's worth** -- describe a single unit of work at the granularity of one merge, not a milestone ("Phase 2") or a sub-task ("fix typo in handler").
-- **Parallel phrasing across siblings** -- tickets under one epic share grammatical shape (all `Verb + object`) so the set reads as a coherent plan.
+- **Parallel phrasing across siblings** -- tickets under one epic share grammatical shape so the set reads as a coherent plan.
 
 ## Cross-references
 
