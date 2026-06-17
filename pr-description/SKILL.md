@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, Glob
 
 ## Key Rules
 
-1. **Write from scratch** — ignore the conversation history. Describe what's in the diff, not what was debated.
+1. **Write from scratch** — ignore the conversation history. Describe what's in the diff, not what was debated. Follow the `write` skill for prose style.
 2. **Testing sections = manual only** — CI covers build, lint, and unit tests. Only include steps that validate behavior beyond CI.
 3. **Single-quoted heredoc** — use `<<'EOF'` so backticks are literal. Do not escape them with `` \` ``.
 
