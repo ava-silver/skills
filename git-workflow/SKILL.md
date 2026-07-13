@@ -46,6 +46,12 @@ gt ss --no-edit -q              # push + create/update PR(s) in the stack
 
 `git ac` auto-prepends the ticket from the branch name: `[SVLS-1234] short description`.
 
+## Message style
+Commit and branch messages describe intent, not the implementation detail. Keep them concise -- usually under seven words.
+
+- Good: `pr feedback`, `fix redirect behavior`, `implement x feature`
+- Avoid: `drop unneeded impl entry for connection_string_names passthrough`, `make flat sticky_settings local the source of truth`
+
 ## Key rules
 - **Never use `git push`** — always use `gt ss --no-edit -q`
 - Use `gt s` instead of `git pull` to sync
