@@ -1,5 +1,6 @@
 ---
 name: plan-project
+disable-model-invocation: true
 description: Take a project from an RFC/design doc to fully-fleshed Jira tickets under an epic, through four phases — context, scoping, planning, upload. Use when the user says "plan project", "/plan-project", "turn this RFC into tickets", "scope this project", or wants to break a design doc into Jira tickets.
 allowed-tools: Read, Write, Bash, Glob, Grep, Skill
 ---

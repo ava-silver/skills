@@ -1,5 +1,6 @@
 ---
 name: plan-ticket
+disable-model-invocation: true
 description: Create an implementation plan from the current worktree branch, Jira ticket, and relevant codebase context. Use when the user says "plan ticket", "/plan-ticket", "create a plan", "implementation plan", or wants planning from a branch like ava.silver/svls-1234/description; accepts "no grill", "skip grill", or "--no-grill" to skip the grill-me review.
 ---
 

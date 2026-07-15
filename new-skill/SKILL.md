@@ -1,5 +1,6 @@
 ---
 name: new-skill
+disable-model-invocation: true
 description: Create a new Agent skill. Only use when directly invoked.
 allowed-tools: Read, Write, Edit, Bash
 ---

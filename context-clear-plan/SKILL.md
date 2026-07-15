@@ -1,5 +1,6 @@
 ---
 name: context-clear-plan
+disable-model-invocation: true
 description: 'Write a plan that captures everything needed to continue the session after a context clear -- code being worked on, learned principles/takeaways, and next steps. Use when the user says "context clear plan", "/context-clear-plan", "plan for a fresh context", "checkpoint the session", or wants to clear context without re-explaining.'
 ---
 

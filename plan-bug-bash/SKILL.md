@@ -1,5 +1,6 @@
 ---
 name: plan-bug-bash
+disable-model-invocation: true
 description: 'Plan a bug bash from a Jira epic — synthesize what shipped, brainstorm validation tasks grouped by shared-resource contention, and produce an Excel sheet to upload to Google Drive. Use when the user says "plan bug bash", "/plan-bug-bash", "create a bug bash spreadsheet", or wants to turn an epic into validation test cases.'
 allowed-tools: Read, Write, Bash, Glob, Grep, Skill, mcp
 ---

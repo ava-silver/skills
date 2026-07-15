@@ -1,5 +1,6 @@
 ---
 name: post-review
+disable-model-invocation: true
 description: Post a GitHub PR review with inline comments. Use when the user says 'post review', 'submit review', 'post comments on PR', 'leave review', or wants to post code review feedback as a GitHub review with inline comments.
 allowed-tools: Bash(gh api:*), Bash(gh pr view:*), Bash(gh pr diff:*), AskUserQuestion
 ---

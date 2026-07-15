@@ -1,5 +1,6 @@
 ---
 name: check-pr-comments
+disable-model-invocation: true
 description: Check a PR's review comments and determine if each has been addressed -- either by a reply in the thread or by code changes. Flags anything still needing a response or fix. Use when user says 'check PR comments', 'are comments addressed', 'what's unaddressed', 'review comment status', 'which comments need responses', 'did I address all feedback', or invokes /check-pr-comments.
 allowed-tools: Bash
 ---
