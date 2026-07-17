@@ -50,7 +50,7 @@ Before finishing, prune against these failure modes:
 **Step 3: Reinstall**
 
 ```bash
-bunx skills add ~/skills -g -y -a universal claude-code
+bunx skills add ~/skills -g -y -a universal pi claude-code
 ```
 
 Tell the user the skill is ready and can be invoked with `/<skill-name>`.

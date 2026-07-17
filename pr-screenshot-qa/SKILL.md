@@ -25,14 +25,14 @@ Create one checklist at a user-specified OS-temp path. If none is supplied, crea
 
 1. Read its current PR description before editing it.
 2. Inspect the PR diff and relevant tests. Derive screenshot cases from actual UI branches, API failure paths, permissions, responsive breakpoints, and user navigation.
-3. Capture meaningful UI deltas. For navigation or other non-visual behavior, record concise before/after behavior in the table instead of forcing screenshots.
+3. Capture only meaningful UI deltas. Every case must state the exact expected before/after UI difference so the user knows what to validate. If no UI difference is expected, remove it from the checklist; it is not a valid screenshot case.
 4. Deduplicate shared behavior, but preserve provider-specific states when their UI or API differs.
 5. For every case, record:
    - branch that contains it;
    - direct route and clicks needed from page load;
    - flags and query parameters;
    - permission or mock state;
-   - expected before and after result.
+   - exact expected before/after UI difference.
 
 Use repository-supported permission overrides and feature flags to reach permission- or rollout-dependent states. If an override exposes an endpoint-specific failure, preserve the shared testing mechanism and route the narrow backend fix to that endpoint's owner unless the user explicitly wants a broader change.
 
@@ -42,8 +42,10 @@ Prefer supported permission overrides and feature flags before introducing test 
 
 1. Add the smallest reversible local mock or request interception in the current worktree.
 2. Scope it to the target endpoint and test case; keep ordinary page behavior unchanged.
-3. Record the mock, expected error UI, and removal step in the checklist.
-4. Remove the temporary mock after capture. Commit a mock only when it is durable automated-test coverage.
+3. For the **before** capture, run the same mock/state through dev-local from the case's base branch -- `preprod` for a root PR, or its parent branch for a stacked PR. Do not capture a mocked before state from the PR branch.
+4. Stash the uncommitted mock, switch to the PR branch, reapply the stash, and capture the **after** state through that branch's dev-local host.
+5. Record the mock, base branch, expected error UI, and removal step in the checklist.
+6. Remove the temporary mock after capture. Never commit a temporary mock to the base or parent branch; commit it only when it is durable automated-test coverage.
 
 ## PR description
 
@@ -59,9 +61,9 @@ Ensure the **Changes** section has one paste-ready HTML table:
 ```
 
 - Preserve existing valid screenshot attachments.
-- Add all meaningful UI and behavior cases, including connected and disconnected variants where they differ.
-- Keep exactly **Case**, **Before**, and **After** columns.
-- Use paste-ready screenshot cells only for UI deltas. For behavior-only rows, link the case URL and write the before/after behavior as text.
+- Add all meaningful UI cases, including connected and disconnected variants where their UI differs.
+- Keep exactly **Case**, **Before**, and **After** columns. For screenshot-heavy tables, set the table to full width with 20% Case, 40% Before, and 40% After columns.
+- Every row must state its exact expected UI difference in the Case cell; remove behavior-only rows.
 - Do not add control-only rows or visible placeholder prose.
 - Update the PR description only after rereading its current body.
 
@@ -70,11 +72,12 @@ Ensure the **Changes** section has one paste-ready HTML table:
 For one case at a time:
 
 1. Switch this worktree to the case branch when permitted. Verify the changed code is present before opening local.
-2. Open the PR and the **before** URL. State whether it is local or not. Wait for the user to capture it.
-3. Mark before complete, open the matching **local** URL, and state whether it is local or not. Wait for capture.
-4. Explain the exact expected visual delta before asking the user to compare.
-5. Mark the case complete only after the user confirms it.
-6. Move to the next unchecked screenshot row.
+2. If the case needs mocked API calls or other local state, start dev-local on the case's base branch -- `preprod` for a root PR, or the parent branch for a stacked PR -- using the same mock/state planned for local.
+3. Open the PR and the **before** URL. State whether it is local or not. For mocked/stateful cases, it must use that base-branch dev-local instance. Wait for the user to capture it.
+4. Mark before complete, open the matching **local** URL with the same mock/state, and state whether it is local or not. Wait for capture.
+5. State the exact expected before/after UI difference before asking the user to compare. If none exists, remove the case rather than asking for capture.
+6. Mark the case complete only after the user confirms it.
+7. Move to the next unchecked screenshot row.
 
 For routes that require a clean/new org, use the user-specified alternate host. If local routing is supplied through a browser extension, open the alternate host and explicitly say it is not local.
 
