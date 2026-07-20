@@ -38,6 +38,8 @@ gt ss --no-edit -q   # pushes the full stack
 
 `gt create` is not the default. Only use it if `git cr` cannot achieve the desired branch shape, and document why.
 
+Keep every PR in a stack well-scoped and free of extraneous changes. Add each change to the PR where it fits best.
+
 ## Adding commits
 ```bash
 git ac short description here   # stages all + commits (does NOT push)
