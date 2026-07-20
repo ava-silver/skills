@@ -19,15 +19,18 @@ Ask for any missing inputs before opening URLs:
 
 Before any git, `gt`, or `gh` command, load the `git-workflow` skill. Use `gt log short` only as a starting point; resolve the actual PR branches and base refs before declaring the stack. Exclude adjacent Graphite branches that are not in scope.
 
-Create one checklist at a user-specified OS-temp path. If none is supplied, create a Markdown file with `mktemp` under the OS temporary directory. Each row tracks the PR, branch, route, state/mocking, expected visual result, and before/after status.
+Create one checklist at a user-specified OS-temp path. If none is supplied, create a Markdown file with `mktemp` under the OS temporary directory. Structure it with a status legend (`[ ]` not started, `[~]` in progress, `[x]` captured), URL rules, and per-PR headings. Each case tracks the PR, branch, route, state/mocking, exact expected UI difference, and before/after status.
+
+Only when the user asks for handoff to another agent, add concise **Implementation status** and **Handoff** sections with the current state, remaining work, and any branch/mock instructions needed to resume safely.
 
 ## Catalog each PR
 
 1. Read its current PR description before editing it.
 2. Inspect the PR diff and relevant tests. Derive screenshot cases from actual UI branches, API failure paths, permissions, responsive breakpoints, and user navigation.
 3. Capture only meaningful UI deltas. Every case must state the exact expected before/after UI difference so the user knows what to validate. If no UI difference is expected, remove it from the checklist; it is not a valid screenshot case.
-4. Deduplicate shared behavior, but preserve provider-specific states when their UI or API differs.
-5. For every case, record:
+4. Make each case one screenshot-worthy viewport and map it 1:1 to one before/after screenshot pair. Combine changes visible in the same viewport into one case; do not create multiple cases for one screenshot.
+5. Deduplicate shared behavior, but preserve provider-specific states when their UI or API differs.
+6. For every case, record:
    - branch that contains it;
    - direct route and clicks needed from page load;
    - flags and query parameters;
@@ -68,6 +71,8 @@ Ensure the **Changes** section has one paste-ready HTML table:
 - Update the PR description only after rereading its current body.
 
 ## Capture loop
+
+Before the first case for each PR, open that PR's edit/description page once and keep it available for pasting the completed screenshot pairs. Do not reopen it for every case unless the user needs it.
 
 For one case at a time:
 
