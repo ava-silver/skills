@@ -53,7 +53,7 @@ Commit and branch messages describe intent, not the implementation detail. Keep 
 - Avoid: `drop unneeded impl entry for connection_string_names passthrough`, `make flat sticky_settings local the source of truth`
 
 ## Key rules
-- **Never use `git push`** — use `gt ss --no-edit -q`; it pushes the entire stack, not just one PR
+- **Never use `git push`** — always use `gt ss --no-edit -q`
 - Use `gt s` instead of `git pull` to sync
 - After creating a PR, update the description with `/pr-description`
 - Do not add Claude as a co-author to any commit
