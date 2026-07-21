@@ -1,31 +1,33 @@
 ---
 name: adversarial-review
 disable-model-invocation: true
-description: 'Run two independent adversarial reviews of the current diff, adjudicate every finding, fix accepted issues, and report the outcome.'
+description: 'Run two independent reviews of the current diff, adjudicate findings, fix accepted issues, and report the outcome.'
 ---
 
 # Adversarial Review
 
-Stress-test the current change with two independent reviewers, then own the verdict and fixes.
+Stress-test the current change with two independent applications of the repository's code-review skill, then own the verdict and fixes.
 
 ## Workflow
 
-1. Define the review scope from the user's arguments. Otherwise use working-tree changes versus `HEAD`, including staged, unstaged, and untracked files. If the scope is empty, report that and stop.
-2. Spawn exactly two subagents in parallel. Give both the scope, repository path, and these shared rules:
-   - Inspect the diff plus relevant surrounding code and tests.
-   - Make no edits. Use only read-only git commands.
-   - Report actionable findings with severity, file/line, evidence, impact, and a concrete fix.
-   - Exclude style preferences, speculative concerns without a plausible failure path, and duplicates within the report.
-3. Give the reviewers different adversarial lenses:
-   - **Correctness breaker:** hunt for logic errors, regressions, crashes, security problems, data loss, races, resource leaks, and broken error handling.
-   - **Assumption breaker:** challenge edge cases, API and integration contracts, compatibility, state transitions, operational behavior, and test gaps that can hide real defects.
-4. Wait for both reports. Verify every finding yourself against the code; do not accept a claim merely because a reviewer made it. Merge duplicates only after verification.
-5. Fix every finding you agree with, using the smallest coherent change. Run focused tests or checks for each fix, then broader relevant checks when practical.
-6. For every rejected finding, record the concrete reason it does not apply. Treat uncertain findings as unresolved and investigate until you can accept or reject them.
-7. Report concise results under:
+1. Define the scope from the user's arguments. Otherwise review staged, unstaged, and untracked changes versus `HEAD`. Stop if the scope is empty.
+2. Read `../code-review/SKILL.md`. Collect the diff, commit list, applicable standards, and available spec sources its process requires.
+3. Spawn exactly two subagents in parallel. Give both the repository path, scope, diff command, commit list, standards sources, and spec source. Require each to:
+   - Read and apply `code-review/SKILL.md` to the full scope.
+   - Inspect every changed hunk plus relevant surrounding code and tests.
+   - Make no edits and use only read-only git commands.
+   - Spawn no subagents.
+4. Add one emphasis to each review without narrowing the shared code-review rubric:
+   - **Failure lens:** aggressively test logic, error paths, state transitions, security, compatibility, and operational behavior.
+   - **Design lens:** aggressively test clarity, cohesion, duplication, boundaries, change risk, and whether tests expose behavior.
+5. Verify every finding yourself against the code, standards, and requirements. Merge duplicates only after verification. Investigate uncertainty until resolved or list it as remaining risk.
+6. Before editing, separate findings whose fixes belong to the current work from worthwhile changes outside its scope. Flag out-of-scope fixes as potential scope creep and get explicit user approval before implementing them. Do not treat reviewer agreement as approval.
+7. Fix each approved finding with the smallest coherent change. Run focused checks for each fix, then broader relevant checks when practical.
+8. Report only:
    - **Fixed:** severity, issue, changed files, and verification.
-   - **Disagreed:** severity, claim, and reason.
-   - **Remaining risk:** only checks you could not run or issues blocked from resolution.
+   - **Disagreed:** severity, claim, and concrete rejection reason.
+   - **Remaining risk:** unresolved issues or checks not run.
+   - **Summary:** finding count by reviewer lens and the worst issue in each.
 
 ## Guardrail
 
