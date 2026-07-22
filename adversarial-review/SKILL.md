@@ -21,7 +21,7 @@ Stress-test the current change with two independent applications of the reposito
    - **Failure lens:** aggressively test logic, error paths, state transitions, security, compatibility, and operational behavior.
    - **Design lens:** aggressively test clarity, cohesion, duplication, boundaries, change risk, and whether tests expose behavior.
 5. Verify every finding yourself against the code, standards, and requirements. Merge duplicates only after verification. Investigate uncertainty until resolved or list it as remaining risk.
-6. Before editing, separate findings whose fixes belong to the current work from worthwhile changes outside its scope. Flag out-of-scope fixes as potential scope creep and get explicit user approval before implementing them. Do not treat reviewer agreement as approval.
+6. Before editing, separate findings whose fixes belong to the current work from worthwhile changes outside its scope. Flag out-of-scope fixes as potential scope creep (especially if new codeowners would be added) and get explicit user approval before implementing them. Do not treat reviewer agreement as approval.
 7. Fix each approved finding with the smallest coherent change. Run focused checks for each fix, then broader relevant checks when practical.
 8. Report only:
    - **Fixed:** severity, issue, changed files, and verification.
