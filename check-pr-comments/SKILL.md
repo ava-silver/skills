@@ -13,8 +13,9 @@ Fetch all review threads, classify each, and report only threads still needing a
 
 1. Check **both** inline review comments (`pulls/{pr}/comments`) and PR-level issue comments (`issues/{pr}/comments`).
 2. **Do not trust GitHub's "resolved" toggle** — check the actual substance.
-3. **REPLY CLAIMS CHANGE NOT FOUND**: if the author's reply claims a fix ("fixed", "updated", "done", "addressed", "pushed") but the diff shows no corresponding change at that file/area, flag it prominently — they likely forgot to push.
-4. Output only unresolved threads. If all addressed, one line is enough.
+3. **CODE CHANGES CAN ADDRESS A THREAD WITHOUT A REPLY**: inspect the diff and relevant changed files for every request. A code change that substantively implements the requested improvement is **ADDRESSED**, even when the author never replied; for example, extracting a requested shared test helper and using it across the affected tests.
+4. **REPLY CLAIMS CHANGE NOT FOUND**: if the author's reply claims a fix ("fixed", "updated", "done", "addressed", "pushed") but the diff shows no corresponding change at that file/area, flag it prominently — they likely forgot to push.
+5. Output only unresolved threads. If all addressed, one line is enough.
 
 ## Commands
 
@@ -29,11 +30,11 @@ gh pr diff {pr}
 
 Group inline comments by `in_reply_to_id` (null = thread root). Classify each thread:
 
-- **ADDRESSED** — author replied after reviewer, and any claimed code change is in the diff
+- **ADDRESSED** — author replied with a sufficient resolution, or the diff substantively implements the requested change (with or without a reply)
 - **REPLY CLAIMS CHANGE NOT FOUND** — author says "fixed" but diff doesn't confirm it
-- **NEEDS REPLY** — question or request with no author reply
-- **NEEDS CODE CHANGE** — change requested, no diff change found
-- **AMBIGUOUS** — reply exists but unclear if concern is resolved
+- **NEEDS REPLY** — question or request has neither a sufficient reply nor a corresponding code change
+- **NEEDS CODE CHANGE** — change requested, and neither the diff nor a sufficient reply resolves it
+- **AMBIGUOUS** — reply or code change exists but it is unclear whether the concern is resolved
 
 Output format:
 ```
