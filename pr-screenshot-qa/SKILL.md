@@ -58,7 +58,17 @@ Ensure the **Changes** section has one paste-ready HTML table:
 <table>
 <thead><tr><th>Case</th><th>Before</th><th>After</th></tr></thead>
 <tbody>
-<tr><td>Meaningful visual case</td><td><!-- Paste screenshot --></td><td><!-- Paste screenshot --></td></tr>
+<tr>
+<td>Meaningful visual case</td>
+<td><!-- Paste screenshot --></td>
+<td><!-- Paste screenshot --></td>
+</tr>
+
+<tr>
+<td>Another Meaningful visual case</td>
+<td><!-- Paste screenshot --></td>
+<td><!-- Paste screenshot --></td>
+</tr>
 </tbody>
 </table>
 ```

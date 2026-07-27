@@ -37,14 +37,36 @@ gh pr edit --body-file /tmp/pr-body.md
 
 If the changes involve a non-obvious flow (e.g. a new state machine, multi-service interaction, or complex branching logic), add a Mermaid diagram using the `diagram` skill. GitHub renders Mermaid natively in PR descriptions -- output as an inline fenced block, no file needed. Only add a diagram when it meaningfully aids understanding; don't add one just to have one.
 
-## QA links (UI PRs only)
+## UI PRs
 
-```bash
-HASH=$(yarn hash --hash-only)
+UI PRs should include a before/after table comparing the old and new UI behavior. While you may not be able to get the screenshots yourself, you can make the table for the user to take screenshots and compare them themselves:
+
+```html
+<table>
+<tr><td>Before</td><td>After</td></tr>
+
+<!--- Which Page to check (or how to get there) -->
+<tr><td>
+
+</td>
+<td>
+
+</td></tr>
+
+<!--- Which Next Page to check (or how to get there) -->
+<tr><td>
+
+</td>
+<td>
+
+</td></tr>
+</table>
 ```
 
+To get the branch hash for preview links: `yarn hash --hash-only`
+
 - **Serverless-only**: `https://ddserverless-${HASH}.datadoghq.com/<inferred-path>`
-- **Cross-team** (touches shared/non-serverless code): both `ddserverless-${HASH}` and `app-${HASH}` URLs
+- **Cross-team** (touches shared or non-serverless code): both `ddserverless-${HASH}` and `app-${HASH}` URLs
 - Ambiguous? Ask.
 
-Infer path from changed file paths. Feature flags: `?config_flag-name=value` URL params.
+Infer path from changed file paths. Feature flags: `?config_flag-name=true` URL params.
