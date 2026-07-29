@@ -1,12 +1,12 @@
 ---
 name: adversarial-review
 disable-model-invocation: true
-description: 'Run two independent reviews of the current diff, adjudicate findings, fix accepted issues, and report the outcome.'
+description: 'Run two independent reviews of the current diff, adjudicate findings, and propose changes for user approval without editing files.'
 ---
 
 # Adversarial Review
 
-Stress-test the current change with two independent applications of the repository's code-review skill, then own the verdict and fixes.
+Stress-test the current change with two independent applications of the repository's code-review skill, then recommend what, if anything, should change. Do not implement recommendations.
 
 ## Workflow
 
@@ -21,14 +21,12 @@ Stress-test the current change with two independent applications of the reposito
    - **Failure lens:** aggressively test logic, error paths, state transitions, security, compatibility, and operational behavior.
    - **Design lens:** aggressively test clarity, cohesion, duplication, boundaries, change risk, and whether tests expose behavior.
 5. Verify every finding yourself against the code, standards, and requirements. Merge duplicates only after verification. Investigate uncertainty until resolved or list it as remaining risk.
-6. Before editing, separate findings whose fixes belong to the current work from worthwhile changes outside its scope. Flag out-of-scope fixes as potential scope creep (especially if new codeowners would be added) and get explicit user approval before implementing them. Do not treat reviewer agreement as approval.
-7. Fix each approved finding with the smallest coherent change. Run focused checks for each fix, then broader relevant checks when practical.
+6. Separate findings that belong to the current work from worthwhile changes outside its scope. Challenge every suggestion for scope, ownership, compatibility, risk, and whether the benefit justifies the change. Reviewer agreement is evidence, not approval.
+7. Present the changes you recommend and wait for the user to decide what to pursue. Do not edit files, even when a fix appears safe or obvious.
 8. Report only:
-   - **Fixed:** severity, issue, changed files, and verification.
+   - **Proposed:** severity, issue, recommended change, rationale, affected files, and verification plan. Clearly flag scope expansion and other reasons the user may want to decline.
    - **Disagreed:** severity, claim, and concrete rejection reason.
-   - **Remaining risk:** unresolved issues or checks not run.
-   - **Summary:** finding count by reviewer lens and the worst issue in each.
 
 ## Guardrail
 
-Git access is read-only. Never stage, commit, amend, switch branches, reset, rebase, or push during this workflow.
+The workflow is read-only. Never edit files or stage, commit, amend, switch branches, reset, rebase, or push.
