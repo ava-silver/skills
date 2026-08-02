@@ -21,7 +21,15 @@ Stress-test the current change with two independent applications of the reposito
    - **Failure lens:** aggressively test logic, error paths, state transitions, security, compatibility, and operational behavior.
    - **Design lens:** aggressively test clarity, cohesion, duplication, boundaries, change risk, and whether tests expose behavior.
 5. Verify every finding yourself against the code, standards, and requirements. Merge duplicates only after verification. Investigate uncertainty until resolved or list it as remaining risk.
-6. Separate findings that belong to the current work from worthwhile changes outside its scope. Challenge every suggestion for scope, ownership, compatibility, risk, and whether the benefit justifies the change. Reviewer agreement is evidence, not approval.
+6. Separate findings that belong to the current work from worthwhile changes outside its scope. Push back on a suggestion when you see:
+   - **Scope creep:** it expands beyond the current change, including adding or changing code ownership.
+   - **Disproportionate refactor:** its churn and review burden outweigh its benefit.
+   - **Unclear requirement:** intended behavior needs clarification.
+   - **Intentional tradeoff:** the current behavior serves another known constraint.
+   - **Weak evidence:** it lacks a concrete, plausible failure mode.
+   - **Compatibility risk:** it could break APIs, data, clients, or workflows that are currently in production. Don't assume code is in production, so this one is a softer suggestion.
+
+   Reviewer agreement is evidence, not approval.
 7. Present the changes you recommend and wait for the user to decide what to pursue. Do not edit files, even when a fix appears safe or obvious.
 8. Report only:
    - **Proposed:** severity, issue, recommended change, rationale, affected files, and verification plan. Clearly flag scope expansion and other reasons the user may want to decline.
