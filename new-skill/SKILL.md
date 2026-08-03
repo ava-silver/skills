@@ -2,7 +2,6 @@
 name: new-skill
 disable-model-invocation: true
 description: Create a new Agent skill. Only use when directly invoked.
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 # New Skill
@@ -27,8 +26,7 @@ A skill exists for **predictability**: the agent takes the same *process* every 
 ```markdown
 ---
 name: <skill-name>
-description: '<One-line description + trigger phrases so Claude knows when to invoke it.>'
-allowed-tools: <only what the skill actually needs>
+description: '<One-line description + trigger phrases so the agent knows when to invoke it.>'
 ---
 
 # <Title>
