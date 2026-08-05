@@ -6,9 +6,9 @@ description: Create a new Agent skill. Only use when directly invoked.
 
 # New Skill
 
-Creates a new Agent skill, checked into the skills repo and installed via `bunx skills`.
+Creates a new Agent skill in the skills repo.
 
-Skills live at `~/skills/<skill-name>/SKILL.md`. Never write directly to `~/.claude/skills/` or `~/.agent/skills/`.
+Skills live at `~/skills/skills/<skill-name>/SKILL.md`. Write only the skill file; installation, commits, branches, and PRs require an explicit user request.
 
 A skill exists for **predictability**: the agent takes the same *process* every run. Every choice below serves that.
 
@@ -21,7 +21,7 @@ A skill exists for **predictability**: the agent takes the same *process* every 
 
 **Step 2: Write the skill file**
 
-> **YAML gotcha:** If the description contains `: ` (colon-space), wrap it in single quotes — otherwise the YAML parser treats it as a mapping key and the skill is silently skipped by `bunx skills add`. Trigger phrase lists like `Triggers: "foo", "bar"` are the common culprit.
+> **YAML gotcha:** If the description contains `: ` (colon-space), wrap it in single quotes -- otherwise the YAML parser treats it as a mapping key and the skill is silently skipped. Trigger phrase lists like `Triggers: "foo", "bar"` are the common culprit.
 
 ```markdown
 ---
