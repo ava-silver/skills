@@ -5,7 +5,7 @@ description: 'Create a Mermaid diagram (.mmd) and render it to an image. Use whe
 
 # Diagram
 
-Creates a Mermaid diagram, writes it to a `.mmd` file, and renders it to a PNG using `mmdc`.
+Creates a Mermaid diagram, writes it to a `.mmd` file, and renders it interactively using `tldraw-mermaid`.
 
 ## Before Writing Anything
 
@@ -31,5 +31,5 @@ If the request is clear enough to proceed without ambiguity, skip the questions 
 1. Clarify (if needed) per above
 2. Determine output mode:
    - **Inline** (GitHub PR/issue descriptions, Markdown files, Confluence, any context that renders Mermaid natively): output the diagram as a fenced `mermaid` code block -- no file, no render step
-   - **Rendered image** (presentations, docs that don't render Mermaid, user asked for a PNG/SVG): write a `.mmd` file, then render with `mmdc -i input.mmd -o output.png -b transparent` (install via `brew install mermaid-cli` if missing)
+   - **Rendered image** (presentations, docs that don't render Mermaid, user asked for a PNG/SVG, or interactive editing): write a `.mmd` file, then run `tldraw-mermaid diagram.mmd` -- it opens a live tldraw canvas in the browser with hot-reload on save. Shapes are real tldraw objects (draggable, resizable, restyle-able). Export to PNG/SVG from the tldraw UI if a static image is needed. (`bun link` in `~/repos/tldraw-mermaid/` to install if missing)
 3. If the output mode isn't obvious from context, ask before proceeding
