@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  - repo: local
+    hooks:
+      - id: validate-skill-metadata
+        name: validate skill metadata
+        entry: python3 scripts/validate_skill_metadata.py
+        language: python
+        additional_dependencies: [PyYAML==6.0.2]
+        files: ^skills/[^/]+/SKILL\.md$
