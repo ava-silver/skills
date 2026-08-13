@@ -32,7 +32,8 @@ Cite documented rules when present; otherwise show the recurring surrounding-cod
 - **Repeated Conditionals:** the same switch or if-cascade recurs. Centralize it with polymorphism or a shared map.
 - **Shotgun Surgery:** one logical change requires scattered edits. Gather the changing behavior into one module.
 - **Divergent Change:** one module changes for unrelated reasons. Split it by responsibility.
-- **Speculative Generality:** abstractions or hooks serve no current requirement. Remove or inline them until needed.
+- **Speculative Generality:** abstractions, hooks, or extra parameters which aren't tied to a specific concept, or are only used in one place. Remove or inline them until needed.
+- **Unjustified Guard:** a defensive construct (assertion on internal data/state, typeof checks, extra fallback default) which shouldn't be hit at runtime, or provide no additional benefit over letting the error bubble up normally. Use proper typing, and knowledge of the codebase to avoid these checks.
 - **Message Chains:** callers navigate deep object graphs. Hide the traversal behind a method on the owning object.
 - **Middle Man:** code mostly delegates without adding meaning. Remove it and call the real target directly.
 - **Refused Bequest:** a subtype ignores most inherited behavior. Replace inheritance with composition.
