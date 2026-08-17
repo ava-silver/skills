@@ -10,7 +10,7 @@ Stress-test the current change with two independent applications of the reposito
 
 ## Workflow
 
-1. Define the scope from the user's arguments. Otherwise review staged, unstaged, and untracked changes versus `HEAD`. Stop if the scope is empty.
+1. Define the scope from the user's arguments. Otherwise review staged, unstaged, and untracked changes versus `HEAD`. If the working tree is clean, review the current PR diff against its base branch. Stop only if there are no working-tree changes and no associated PR.
 2. Read `../code-review/SKILL.md`. Collect the diff, commit list, applicable standards, and available spec sources its process requires.
 3. Spawn exactly two subagents in parallel. Give both the repository path, scope, diff command, commit list, standards sources, and spec source. Require each to:
    - Read and apply `code-review/SKILL.md` to the full scope.

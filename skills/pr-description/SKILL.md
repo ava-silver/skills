@@ -8,19 +8,21 @@ allowed-tools: Bash, Read, Glob
 
 ## Key Rules
 
-1. **Write from scratch** — ignore the conversation history. Describe what's in the diff, not what was debated. Follow the `write` skill for prose style.
-2. **Be brief** — the diff is the source of truth. Don't restate it. Explanatory sections (e.g. "How") get a one-to-two sentence overview, not a play-by-play. Summary is a short bulleted list. Cut anything a reader could get from reading the changes.
-3. **Testing sections = manual only** — CI covers build, lint, and unit tests. Only include steps that validate behavior beyond CI.
-4. **Write to a temp file** — write the body to a temp file and pass it via `gh pr edit --body-file`. This is less error-prone than a heredoc (no backtick/quote escaping issues).
-5. **No Boilerplate** — avoid mentioning the context of the graphite stack, or any other obvious boilerplate text. The user can already deduce that from the graphite comment or other context already provided.
+1. **Lead with why** — explain the failure, user impact, or constraint that motivates the change before summarizing it. Use evidence previously provided in the session, CI failures, or code links. Do not infer a cause that those sources do not support.
+2. **Write from scratch** — otherwise ignore the conversation history. Describe the intent and outcome supported by the PR context and diff, not what was debated. Follow the `write` skill for prose style.
+3. **Be brief** — the diff is the source of truth for implementation details. Don't restate it. Explanatory sections (e.g. "How") get a one-to-two sentence overview, not a play-by-play. Summary is a short bulleted list.
+4. **Testing sections = manual only** — CI covers build, lint, and unit tests. Only include manual validation beyond CI done by you or the user, with the scope and result (for example, the image and platform built successfully).
+5. **Write to a temp file** — write the body to a temp file and pass it via `gh pr edit --body-file`. This is less error-prone than a heredoc (no backtick/quote escaping issues).
+6. **No boilerplate** — avoid mentioning the Graphite stack or other context the reader can already deduce.
 
 ## Workflow
 
-1. Fetch diff and current state:
+1. If you didn't create the PR and don't have context on it already, gather the PR's intent and implementation:
 ```bash
-gh pr view --json title,body,files
-git diff $(git main)...HEAD
+gh pr view --json title,body,files,commits,closingIssues
+gh pr diff
 ```
+If you don't have the relevant context, read linked issues and relevant failed CI logs when they explain why the change is needed. If the available context does not establish a why, ask the author rather than inventing one.
 
 2. Check for a PR template:
 ```bash
