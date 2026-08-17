@@ -15,6 +15,7 @@ Try to infer the following, and only ask the user to clarify what they're lookin
 ## Readability Principles
 
 - **Keep labels short** -- node labels under ~30 chars
+- **Use concrete code anchors** -- name relevant repositories and files in node labels or subgraphs when they help orient the reader (for example, `serverless-ci / Dockerfile`).
 - **Avoid crossing edges** -- arrange nodes to minimize overlaps; prefer `TD` for hierarchies, `LR` for pipelines
 - **Group related nodes** with `subgraph` blocks, but only when they add clarity
 - **No wall-of-text nodes** -- if a label needs explanation, add a note to the user when presenting the diagram, not in the node
