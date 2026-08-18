@@ -11,7 +11,7 @@ user_invocable: false
 Run `is-graphite` in the repository before choosing mutation or sync commands.
 
 - `graphite set up` -- use the Graphite commands below.
-- `graphite not set up` -- never use `gt`; use normal Git commands. `git cr` and `git ac` already adapt to either workflow.
+- `graphite not set up` -- never use `gt`; use normal Git commands. `git cr` and `git ac` already adapt to either workflow. Note that for config repos like `dotfiles` or `skills`, you should just commit to the working branch.
 
 ## Branch naming
 Keep an existing branch name. When creating your own branch, use `ava.silver/{ticket}/{short-description}` -- e.g. `ava.silver/svls-1234/fix-timeout`.
