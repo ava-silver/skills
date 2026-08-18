@@ -6,54 +6,102 @@ disable-model-invocation: true
 
 # Insights
 
-Excavate pi session logs for friction and pain points, cross-referenced against the current setup, to surface what's worth improving.
+Mine Pi session logs for repeated friction, then compare it with the current setup to find improvements worth making.
 
-**State file:** `~/skills/skills/insights/reviewed.json` -- a JSON array of session IDs already analyzed. Never re-read those sessions. Create the file if it doesn't exist.
+## State
 
-## Setup context
+Reviewed session IDs live in `~/skills/skills/insights/reviewed.json`. The extraction script creates this file when missing. Never analyze a reviewed session again.
 
-Load before analyzing:
-- **Skills:** `~/skills/skills/` -- what's already been addressed
-- **Dotfiles/pi:** `~/dotfiles/pi/` (extensions, settings, prompts, keybindings) -- what's been configured
-- **AGENTS.md:** `~/.pi/agent/AGENTS.md` -- standing agent instructions
+The script excludes the active `PI_SESSION_FILE`, follows only each session's active branch, and deduplicates identical transcripts. A validated result checkpoints every duplicate source ID.
 
-## Session log format
+## Load current context
 
-Sessions live at `~/.pi/agent/sessions/<cwd-slug>/*.jsonl` (one `.jsonl` per session). Extract the session ID from the filename (UUID after the timestamp).
+Before analysis, inspect:
 
-Each line is a JSON record. Relevant types:
-- `session` -- `cwd`, `timestamp`
-- `message` -- `message.role` (`"user"` or `"assistant"`), `message.content[].text`
-- `model_change` -- which model was active
-- `custom_message` where `customType == "subagent-result"` -- subagent outcomes (check `details.status`)
+- `~/skills/skills/` -- existing skills
+- `~/dotfiles/pi/` -- extensions, settings, prompts, and keybindings
+- `~/.pi/agent/AGENTS.md` -- standing instructions
 
-## Extraction script
+This context may postdate the sessions. Treat it as current coverage, not evidence that historical friction never happened.
 
-Run `python3 ~/skills/skills/insights/extract_sessions.py` to get a JSON array of unreviewed sessions. Read that file for the full implementation.
+## Choose a bounded scope
 
-## Mining signals
+List unreviewed session metadata without putting transcripts in the tool output:
 
-Fan sessions out to parallel subagents (via `workflow`). For each session, ask the subagent to identify:
-
-- **Corrections/retries:** user saying "no", "wait", "actually", "that's wrong", "try again"
-- **Explicit frustration:** complaints about verbosity, missed context, wrong tool, slow/expensive responses
-- **Tool/subagent failures:** errors in `custom_message` records
-- **Abandoned tasks:** long sessions that end without resolution
-- **Model switches:** `model_change` events mid-session (often frustration-driven)
-- **Workarounds:** user doing something manually that an existing skill should handle
-
-Schema for each subagent:
-```json
-{ "pain_points": [{ "quote": "...", "category": "...", "severity": 1-3 }], "already_addressed_by": "..." }
+```bash
+python3 ~/skills/skills/insights/extract_sessions.py list > /tmp/insights-candidates.json
 ```
 
-## Synthesis
+Use `jq` to summarize candidates by `cwd`, date, message count, model changes, and failures. If the user did not specify a scope, ask them to choose repositories or a similarly coherent slice.
 
-After fan-out, synthesize across all sessions:
-1. Rank by frequency × severity
-2. Note which pain points are already covered by an existing skill or dotfiles config (deprioritize)
-3. For each top pain point, suggest a concrete fix: new skill, AGENTS.md change, dotfiles tweak, or extension
+Extract at most 30 sessions. `--cwd` and `--session` are repeatable; multiple CWD filters form a union, and CWD/session filters compose as an intersection.
 
-## After analysis
+```bash
+rm -rf /tmp/insights-sessions
+python3 ~/skills/skills/insights/extract_sessions.py extract \
+  --cwd datadog-ci \
+  --cwd serverless-ci \
+  --limit 30 \
+  --output-dir /tmp/insights-sessions
+```
 
-Update the state file with all newly reviewed session IDs (append the new IDs to `~/skills/skills/insights/reviewed.json`).
+The command writes one full evidence file per session plus `index.json`. Do not analyze more batches unless the user asks to continue.
+
+## Mine sessions
+
+Use one `workflow` agent per indexed session. Keep the fan-out at 30 or fewer agent calls so the workflow stays below its 32-call budget. Pass the parsed index as workflow arguments rather than spending an agent call loading it. Synthesize in the parent after the workflow returns.
+
+Give each agent its session evidence file and a concise temporary summary of the current setup. Each agent identifies only demonstrated friction:
+
+- user corrections or retries
+- explicit frustration
+- failed tools or subagents (`status: "error"`; `done` is success)
+- tasks that end without resolution
+- model switches plausibly linked to frustration, excluding initial selection
+- manual workarounds that a current skill or configuration should handle
+
+Do not treat ordinary iteration, initial requirements, or words such as "actually" in technical prose as pain. Require exact, short substrings from user records.
+
+Use this schema:
+
+```json
+{
+  "pain_points": [
+    {
+      "record_id": "entry-id",
+      "quote": "exact substring from that user record",
+      "category": "...",
+      "severity": 1
+    }
+  ],
+  "already_addressed_by": "existing skill/config, or none"
+}
+```
+
+Severity is 1 for minor friction, 2 for material or repeated friction, and 3 for task-derailing failure. Return at most five pain points per session.
+
+## Validate and checkpoint
+
+Write each successful agent's structured result to its own JSON file. Validate exact evidence before using or checkpointing it:
+
+```bash
+python3 ~/skills/skills/insights/extract_sessions.py validate \
+  --session-file /tmp/insights-sessions/<session-id>.json \
+  --result-file /tmp/insights-results/<session-id>.json \
+  --checkpoint
+```
+
+Invalid results must not be synthesized or checkpointed. Correct or rerun them. If the workflow partially fails, validate and checkpoint only successful results.
+
+## Synthesize
+
+Use only validated results:
+
+1. Cluster equivalent pain points and count distinct deduplicated sessions.
+2. Rank clusters by frequency x severity.
+3. Deprioritize friction already covered by today's skills or configuration.
+4. Separate repeated workflow problems from repository-specific one-offs and normal clarification.
+5. For each top issue, recommend the smallest concrete fix: an existing skill, new skill, `AGENTS.md`, dotfiles tweak, or extension.
+6. Report the selected scope and sampling bias. Frequencies describe the sample, not all sessions.
+
+Also report extraction, validation, workflow, or data-quality problems found during the run.

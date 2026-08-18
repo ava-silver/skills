@@ -1,18 +1,23 @@
 ---
 name: git-workflow
-description: Ava's git/Graphite (gt) workflow at Datadog. Load BEFORE any git, gt, or gh pr command -- including git commit, git push, git ac, git cr, gt ss, gt s, gt submit, creating branches, opening PRs, syncing, or worktrees. Contains required aliases (git cr, git ac, gt ss --no-edit -q), branch naming (ava.silver/TICKET/desc), and the rule to never use git push.
+description: Ava's git workflow at Datadog. Load BEFORE any git, gt, or gh pr command -- including commits, pushes, branches, PRs, syncing, or worktrees. Detects whether the repository uses Graphite and selects the correct commands.
 user_invocable: false
 ---
 
 # Git Workflow
 
-All repos use **Graphite (`gt`)** for stacked PRs.
+## Choose the workflow
+
+Run `is-graphite` in the repository before choosing mutation or sync commands.
+
+- `graphite set up` -- use the Graphite commands below.
+- `graphite not set up` -- never use `gt`; use normal Git commands. `git cr` and `git ac` already adapt to either workflow.
 
 ## Branch naming
-`ava.silver/{ticket}/{short-description}` — e.g. `ava.silver/svls-1234/fix-timeout`
+Keep an existing branch name. When creating your own branch, use `ava.silver/{ticket}/{short-description}` -- e.g. `ava.silver/svls-1234/fix-timeout`.
 Chore/no-ticket: `ava.silver/chore/{description}`
 
-## Starting work — branch + first commit + PR in one shot
+## Starting work -- branch + first commit + PR in one shot
 ```bash
 git cr svls-1234 short description here
 # → creates branch, stages all, commits [SVLS-1234] short description here, opens PR
@@ -22,11 +27,12 @@ git cr svls-1234 short description here
 **Already on a branch** (e.g. in a worktree with no commits yet): skip `git cr`:
 ```bash
 git ac short description here
-gt ss --no-edit -q
+# Graphite: gt ss --no-edit -q
+# Normal Git: git push
 ```
 
-## Stacked (child) PRs — default path
-**Always use `git cr` from the parent branch.** Do NOT reach for `gt create` — it is not part of this workflow.
+## Stacked (child) PRs -- Graphite only
+**Always use `git cr` from the parent branch.** Do NOT reach for `gt create` -- it is not part of this workflow.
 
 ```bash
 # On parent branch ava.silver/svls-1234/parent-work:
@@ -43,7 +49,8 @@ Keep every PR in a stack well-scoped and free of extraneous changes. Add each ch
 ## Adding commits
 ```bash
 git ac short description here   # stages all + commits (does NOT push)
-gt ss --no-edit -q              # pushes the entire stack, not just this branch; creates/updates its PRs
+# Graphite: gt ss --no-edit -q   # pushes the full stack and creates/updates its PRs
+# Normal Git: git push
 ```
 
 `git ac` auto-prepends the ticket from the branch name: `[SVLS-1234] short description`.
@@ -55,8 +62,8 @@ Commit and branch messages describe intent, not the implementation detail. Keep 
 - Avoid: `drop unneeded impl entry for connection_string_names passthrough`, `make flat sticky_settings local the source of truth`
 
 ## Key rules
-- **Never use `git push`** — always use `gt ss --no-edit -q`
-- Use `gt s` instead of `git pull` to sync
+- In Graphite repositories, never use `git push` -- use `gt ss --no-edit -q`, and use `gt s` instead of `git pull`.
+- In non-Graphite repositories, never use `gt`; use normal Git commands, including `git push` when needed.
 - After creating a PR, update the description with `/pr-description`
 - Do not add Claude as a co-author to any commit
 

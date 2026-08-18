@@ -1,41 +1,391 @@
-"""
-Extract unreviewed pi session messages for insights analysis.
+"""Select, extract, validate, and checkpoint Pi sessions for Insights."""
 
-Usage: python3 extract_sessions.py
-Output: JSON array of sessions with messages to stdout
-"""
+from __future__ import annotations
 
-import glob
+import argparse
+import hashlib
 import json
 import os
+import sys
+from pathlib import Path
+from typing import Any
 
-state_path = os.path.expanduser("~/skills/skills/insights/reviewed.json")
-with open(state_path) as state:
-    reviewed = set(json.load(state)) if os.path.exists(state_path) else set()
+DEFAULT_BATCH_SIZE = 30
+MAX_BATCH_SIZE = 30
 
-sessions = []
-for f in glob.glob(
-    os.path.expanduser("~/.pi/agent/sessions/**/*.jsonl"), recursive=True
-):
-    sid = f.split("_", 1)[-1].replace(".jsonl", "")
-    if sid in reviewed:
-        continue
-    msgs = []
-    meta = {}
-    with open(f) as fh:
-        for line in fh:
-            d = json.loads(line)
-            if d["type"] == "session":
-                meta = {"cwd": d.get("cwd"), "ts": d.get("timestamp")}
-            elif d["type"] == "message":
-                role = d["message"]["role"]
-                text = " ".join(
-                    b["text"]
-                    for b in d["message"].get("content", [])
-                    if b.get("type") == "text"
-                )
-                msgs.append({"role": role, "text": text[:500]})
-    if msgs:
-        sessions.append({"id": sid, "file": f, **meta, "messages": msgs})
 
-print(json.dumps(sessions))
+def write_json_atomic(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary.write_text(json.dumps(value, indent=2) + "\n")
+    os.replace(temporary, path)
+
+
+def load_reviewed(state_path: Path) -> set[str]:
+    if not state_path.exists():
+        write_json_atomic(state_path, [])
+        return set()
+    value = json.loads(state_path.read_text())
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError(f"{state_path} must contain a JSON array of session IDs")
+    return set(value)
+
+
+def content_text(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+    if not isinstance(content, list):
+        return ""
+    return "\n".join(
+        block["text"]
+        for block in content
+        if isinstance(block, dict)
+        and block.get("type") == "text"
+        and isinstance(block.get("text"), str)
+    )
+
+
+def active_branch(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_id = {
+        entry["id"]: entry for entry in entries if isinstance(entry.get("id"), str)
+    }
+    if not by_id:
+        return []
+    current = next(
+        entry for entry in reversed(entries) if isinstance(entry.get("id"), str)
+    )
+    branch = []
+    seen = set()
+    while current:
+        entry_id = current["id"]
+        if entry_id in seen:
+            raise ValueError(f"cycle at entry {entry_id}")
+        seen.add(entry_id)
+        branch.append(current)
+        parent_id = current.get("parentId")
+        if parent_id is None:
+            break
+        current = by_id.get(parent_id)
+        if current is None:
+            raise ValueError(f"missing parent entry {parent_id}")
+    return list(reversed(branch))
+
+
+def evidence_record(entry: dict[str, Any]) -> dict[str, Any] | None:
+    base = {"record_id": entry["id"], "timestamp": entry.get("timestamp")}
+    if entry.get("type") == "model_change":
+        return {
+            **base,
+            "type": "model_change",
+            "provider": entry.get("provider"),
+            "model_id": entry.get("modelId"),
+        }
+    if (
+        entry.get("type") == "custom_message"
+        and entry.get("customType") == "subagent-result"
+    ):
+        details = entry.get("details") if isinstance(entry.get("details"), dict) else {}
+        return {
+            **base,
+            "type": "subagent_result",
+            "status": details.get("status"),
+            "title": details.get("title"),
+            "text": content_text(entry.get("content")),
+        }
+    if entry.get("type") != "message" or not isinstance(entry.get("message"), dict):
+        return None
+    message = entry["message"]
+    role = message.get("role")
+    text = content_text(message.get("content"))
+    if role in ("user", "assistant"):
+        return {
+            **base,
+            "type": "message",
+            "role": role,
+            "text": text,
+            **(
+                {"stop_reason": message.get("stopReason")}
+                if role == "assistant"
+                else {}
+            ),
+            **(
+                {"error": message.get("errorMessage")}
+                if message.get("errorMessage")
+                else {}
+            ),
+        }
+    if role == "toolResult" and message.get("isError"):
+        return {
+            **base,
+            "type": "tool_error",
+            "tool_name": message.get("toolName"),
+            "text": text,
+        }
+    return None
+
+
+def extract_session(path: Path) -> dict[str, Any] | None:
+    header = None
+    entries = []
+    try:
+        for line in path.read_text().splitlines():
+            value = json.loads(line)
+            if value.get("type") == "session":
+                header = value
+            else:
+                entries.append(value)
+        if header is None:
+            raise ValueError("missing session header")
+        branch = active_branch(entries)
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        print(f"Skipping {path}: {error}", file=sys.stderr)
+        return None
+
+    records = [
+        record for entry in branch if (record := evidence_record(entry)) is not None
+    ]
+    if not any(
+        record.get("type") == "message" and record.get("role") == "user"
+        for record in records
+    ):
+        return None
+    session_id = header.get("id")
+    if not isinstance(session_id, str) or not session_id:
+        session_id = path.stem.rsplit("_", 1)[-1]
+    transcript = [
+        {
+            key: value
+            for key, value in record.items()
+            if key not in ("record_id", "timestamp")
+        }
+        for record in records
+    ]
+    transcript_hash = hashlib.sha256(
+        json.dumps(transcript, ensure_ascii=False, separators=(",", ":")).encode()
+    ).hexdigest()
+    return {
+        "id": session_id,
+        "source_ids": [session_id],
+        "file": str(path),
+        "cwd": header.get("cwd"),
+        "ts": header.get("timestamp"),
+        "transcript_hash": transcript_hash,
+        "records": records,
+    }
+
+
+def discover_sessions(
+    session_root: Path, active_file: Path | None = None
+) -> list[dict[str, Any]]:
+    sessions = []
+    active = active_file.resolve() if active_file else None
+    for path in session_root.glob("**/*.jsonl"):
+        if active and path.resolve() == active:
+            continue
+        session = extract_session(path)
+        if session:
+            sessions.append(session)
+
+    groups: dict[str, dict[str, Any]] = {}
+    seen_ids = set()
+    for session in sorted(
+        sessions, key=lambda item: (item.get("ts") or "", item["file"]), reverse=True
+    ):
+        if session["id"] in seen_ids:
+            continue
+        seen_ids.add(session["id"])
+        existing = groups.get(session["transcript_hash"])
+        if existing is None:
+            groups[session["transcript_hash"]] = session
+            continue
+        if session["id"] not in existing["source_ids"]:
+            existing["source_ids"].append(session["id"])
+    return list(groups.values())
+
+
+def select_sessions(
+    sessions: list[dict[str, Any]],
+    reviewed: set[str],
+    cwd_filters: list[str],
+    session_filters: list[str],
+    limit: int | None,
+) -> list[dict[str, Any]]:
+    selected = [
+        session for session in sessions if reviewed.isdisjoint(session["source_ids"])
+    ]
+    if cwd_filters:
+        selected = [
+            session
+            for session in selected
+            if isinstance(session.get("cwd"), str)
+            and any(value in session["cwd"] for value in cwd_filters)
+        ]
+    if session_filters:
+        wanted = set(session_filters)
+        selected = [
+            session
+            for session in selected
+            if not wanted.isdisjoint(session["source_ids"])
+        ]
+    selected.sort(key=lambda item: (item.get("ts") or "", item["id"]), reverse=True)
+    return selected if limit is None else selected[:limit]
+
+
+def metadata(session: dict[str, Any]) -> dict[str, Any]:
+    records = session["records"]
+    return {
+        key: session[key]
+        for key in ("id", "source_ids", "file", "cwd", "ts", "transcript_hash")
+    } | {
+        "message_count": sum(record.get("type") == "message" for record in records),
+        "model_change_count": sum(
+            record.get("type") == "model_change" for record in records
+        ),
+        "subagent_error_count": sum(
+            record.get("type") == "subagent_result" and record.get("status") == "error"
+            for record in records
+        ),
+        "tool_error_count": sum(
+            record.get("type") == "tool_error" for record in records
+        ),
+    }
+
+
+def validate_result(session: dict[str, Any], result: Any) -> None:
+    if not isinstance(result, dict):
+        raise TypeError("result must be a JSON object")
+    pain_points = result.get("pain_points")
+    if not isinstance(pain_points, list):
+        raise TypeError("pain_points must be an array")
+    if not isinstance(result.get("already_addressed_by"), str):
+        raise TypeError("already_addressed_by must be a string")
+    user_records = {
+        record["record_id"]: record["text"]
+        for record in session["records"]
+        if record.get("type") == "message" and record.get("role") == "user"
+    }
+    for index, point in enumerate(pain_points):
+        if not isinstance(point, dict):
+            raise TypeError(f"pain_points[{index}] must be an object")
+        record_id = point.get("record_id")
+        quote = point.get("quote")
+        severity = point.get("severity")
+        if record_id not in user_records:
+            raise ValueError(f"pain_points[{index}].record_id is not a user record")
+        if (
+            not isinstance(quote, str)
+            or not quote
+            or quote not in user_records[record_id]
+        ):
+            raise ValueError(
+                f"pain_points[{index}].quote is not exact evidence from its record"
+            )
+        if not isinstance(point.get("category"), str) or not point["category"]:
+            raise ValueError(
+                f"pain_points[{index}].category must be a non-empty string"
+            )
+        if (
+            isinstance(severity, bool)
+            or not isinstance(severity, int)
+            or not 1 <= severity <= 3
+        ):
+            raise ValueError(f"pain_points[{index}].severity must be 1, 2, or 3")
+
+
+def checkpoint(state_path: Path, session: dict[str, Any]) -> None:
+    reviewed = load_reviewed(state_path)
+    reviewed.update(session["source_ids"])
+    write_json_atomic(state_path, sorted(reviewed))
+
+
+def add_selection_arguments(
+    parser: argparse.ArgumentParser, default_limit: int | None
+) -> None:
+    parser.add_argument(
+        "--cwd", action="append", default=[], help="Include CWDs containing this value"
+    )
+    parser.add_argument(
+        "--session", action="append", default=[], help="Include this session ID"
+    )
+    parser.add_argument("--limit", type=int, default=default_limit)
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--session-root",
+        type=Path,
+        default=Path("~/.pi/agent/sessions").expanduser(),
+    )
+    parser.add_argument(
+        "--state",
+        type=Path,
+        default=Path("~/skills/skills/insights/reviewed.json").expanduser(),
+    )
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    list_parser = commands.add_parser("list", help="List unreviewed session metadata")
+    add_selection_arguments(list_parser, None)
+
+    extract_parser = commands.add_parser(
+        "extract", help="Write a bounded batch to individual JSON files"
+    )
+    add_selection_arguments(extract_parser, DEFAULT_BATCH_SIZE)
+    extract_parser.add_argument("--output-dir", type=Path, required=True)
+
+    validate_parser = commands.add_parser(
+        "validate", help="Validate one result and optionally checkpoint it"
+    )
+    validate_parser.add_argument("--session-file", type=Path, required=True)
+    validate_parser.add_argument("--result-file", type=Path, required=True)
+    validate_parser.add_argument("--checkpoint", action="store_true")
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    try:
+        if args.command == "validate":
+            session = json.loads(args.session_file.read_text())
+            result = json.loads(args.result_file.read_text())
+            validate_result(session, result)
+            if args.checkpoint:
+                checkpoint(args.state, session)
+            print(json.dumps({"valid": True, "source_ids": session["source_ids"]}))
+            return 0
+
+        if args.limit is not None and args.limit < 1:
+            raise ValueError("--limit must be positive")
+        if args.command == "extract" and args.limit > MAX_BATCH_SIZE:
+            raise ValueError(f"--limit must be at most {MAX_BATCH_SIZE}")
+        active_file = (
+            Path(value).expanduser()
+            if (value := os.environ.get("PI_SESSION_FILE"))
+            else None
+        )
+        reviewed = load_reviewed(args.state)
+        sessions = discover_sessions(args.session_root, active_file)
+        selected = select_sessions(
+            sessions, reviewed, args.cwd, args.session, args.limit
+        )
+        if args.command == "list":
+            print(json.dumps([metadata(session) for session in selected], indent=2))
+            return 0
+
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        index = []
+        for session in selected:
+            session_path = args.output_dir / f"{session['id']}.json"
+            write_json_atomic(session_path, session)
+            index.append(metadata(session) | {"path": str(session_path)})
+        index_path = args.output_dir / "index.json"
+        write_json_atomic(index_path, index)
+        print(index_path)
+        return 0
+    except (OSError, json.JSONDecodeError, TypeError, ValueError, KeyError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
