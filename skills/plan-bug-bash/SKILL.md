@@ -2,7 +2,7 @@
 name: plan-bug-bash
 disable-model-invocation: true
 description: 'Plan a bug bash from a Jira epic — synthesize what shipped, brainstorm validation tasks grouped by shared-resource contention, and produce an Excel sheet to upload to Google Drive. Use when the user says "plan bug bash", "/plan-bug-bash", "create a bug bash spreadsheet", or wants to turn an epic into validation test cases.'
-allowed-tools: Read, Write, Bash, Glob, Grep, Skill, mcp
+allowed-tools: Read, Write, Bash, Glob, Grep, Skill
 ---
 
 # Plan Bug Bash
@@ -11,11 +11,11 @@ Drives an epic to a bug bash plan: the **bug bash** is the meeting where testers
 
 On invocation, glob for `BUG-BASH.md`; if it exists, summarize it and ask whether to resume iterating or start fresh.
 
-Load the `atlassian` skill before any Jira call. `grill-me` is required for Phases 1–2 — if missing, install: `npx -y skills@latest add https://github.com/mattpocock/skills -g -y -a claude-code -s grill-me`.
+Load the `acli` skill before any Jira or Confluence call. `grill-me` is required for Phases 1–2 — if missing, install: `npx -y skills@latest add https://github.com/mattpocock/skills -g -y -a claude-code -s grill-me`.
 
 ## Phase 1 — Context (what shipped)
 
-Ask for the target epic key if not provided. Then via the atlassian MCP:
+Ask for the target epic key if not provided. Then use `acli`:
 - Fetch the epic (summary + description) and confirm its summary back to the user.
 - Fetch all child issues (summary + description). These are the **primary** signal for what was built.
 - If a ticket is ambiguous or thin, dig into its linked PRs or the RFC/design doc for more detail.

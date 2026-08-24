@@ -2,7 +2,7 @@
 name: self-eval
 disable-model-invocation: true
 description: 'Guide the user through writing their periodic performance self-evaluation. Triggers: "self-eval", "write my self-eval", "self evaluation", "perf review write-up".'
-allowed-tools: AskUserQuestion, Write, Read, Bash, WebFetch, mcp__plugin_atlassian_atlassian__searchJiraIssuesUsingJql, mcp__plugin_atlassian_atlassian__getJiraIssue, mcp__plugin_slack_slack__slack_search_public_and_private
+allowed-tools: AskUserQuestion, Write, Read, Bash, WebFetch, mcp__plugin_slack_slack__slack_search_public_and_private
 ---
 
 # Self-Eval
@@ -29,7 +29,9 @@ Note: self-eval is a regular reflection process -- not tied to promotion cycles.
 
 ## Step 2: Gather raw materials (last 6 months)
 
-- **Jira**: tickets completed or contributed to, larger initiatives, cross-team work
+Load `acli` before gathering Jira evidence.
+
+- **Jira**: use `acli` to find tickets completed or contributed to, larger initiatives, and cross-team work
 - **Google Calendar**: meetings organized/presented, demos, planning sessions, cross-team syncs
 - **Slack**: threads where you shared updates, gave technical guidance, or helped unblock others
 - **GitHub/GitLab**: PRs authored/reviewed, especially tied to major features or improvements

@@ -11,7 +11,7 @@ Creates an implementation plan. By default, stress-tests it with `grill-me` befo
 ## Key Rules
 
 1. **Planning only** — do not edit code, commit, push, or update tickets unless explicitly asked.
-2. Load `atlassian` before any Jira calls. Load `git-workflow` before any git commands.
+2. Load `acli` before any Jira or Confluence calls. Load `git-workflow` before any git commands.
 3. Ask clarifying questions only after exploring ticket and codebase — if the answer is findable, find it.
 
 ## Arguments
