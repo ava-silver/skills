@@ -38,6 +38,7 @@ Cite documented rules when present; otherwise show the recurring surrounding-cod
 - **Middle Man:** code mostly delegates without adding meaning. Remove it and call the real target directly.
 - **Refused Bequest:** a subtype ignores most inherited behavior. Replace inheritance with composition.
 - **Change-Detector Test:** a test fails when an implementation changes without showing that observable behavior regressed. Replace it with a test of concrete feature functionality, or remove it.
+- **Unnecessary Regression Test:** a test is added only because a bug was fixed, not because it documents required behavior. Remove it, and do not recommend one unless the user explicitly asks.
 
 Also flag tangled functions, weak boundaries, and opaque tests when extracting steps, moving responsibility, or rewriting tests around observable behavior would reduce concrete change risk.
 Label heuristic findings as maintainability judgements, not hard violations. Exclude personal taste and require a concrete readability, change-risk, or testability cost.
