@@ -1,6 +1,6 @@
 ---
 name: plan
-description: 'Create a proportionate implementation plan for a repository code change. Use for code planning requests and before nontrivial implementation with unresolved, consequential design choices.'
+description: 'Create a proportionate implementation plan for a code change. Use ONLY when the user requests a plan for the change.'
 ---
 
 # Plan

@@ -12,8 +12,9 @@ allowed-tools: Bash, Read, Glob
 2. **Write from scratch** — otherwise ignore the conversation history. Describe the intent and outcome supported by the PR context and diff, not what was debated. Follow the `write` skill for prose style.
 3. **Be brief** — the diff is the source of truth for implementation details. Don't restate it. Explanatory sections (e.g. "How") get a one-to-two sentence overview, not a play-by-play. Summary is a short bulleted list.
 4. **Testing sections = manual only** — CI covers build, lint, and unit tests. Only include manual validation beyond CI done by you or the user, with the scope and result (for example, the image and platform built successfully).
-5. **Write to a temp file** — write the body to a temp file and pass it via `gh pr edit --body-file`. This is less error-prone than a heredoc (no backtick/quote escaping issues).
-6. **No boilerplate** — avoid mentioning the Graphite stack or other context the reader can already deduce.
+5. **Link related PRs** — for cross-repository work, include each relevant related PR link and a short note explaining its relationship.
+6. **Write to a temp file** — write the body to a temp file and pass it via `gh pr edit --body-file`. This is less error-prone than a heredoc (no backtick/quote escaping issues).
+7. **No boilerplate** — avoid mentioning the Graphite stack or other context the reader can already deduce.
 
 ## Workflow
 
@@ -39,36 +40,6 @@ gh pr edit --body-file /tmp/pr-body.md
 
 If the changes involve a non-obvious flow (e.g. a new state machine, multi-service interaction, or complex branching logic), add a Mermaid diagram using the `diagram` skill. GitHub renders Mermaid natively in PR descriptions -- output as an inline fenced block, no file needed. Only add a diagram when it meaningfully aids understanding; don't add one just to have one.
 
-## UI PRs
+## Frontend PRs
 
-UI PRs should include a before/after table comparing the old and new UI behavior. While you may not be able to get the screenshots yourself, you can make the table for the user to take screenshots and compare them themselves:
-
-```html
-<table>
-<tr><td>Before</td><td>After</td></tr>
-
-<!--- Which Page to check (or how to get there) -->
-<tr><td>
-
-</td>
-<td>
-
-</td></tr>
-
-<!--- Which Next Page to check (or how to get there) -->
-<tr><td>
-
-</td>
-<td>
-
-</td></tr>
-</table>
-```
-
-To get the branch hash for preview links: `yarn hash --hash-only`
-
-- **Serverless-only**: `https://ddserverless-${HASH}.datadoghq.com/<inferred-path>`
-- **Cross-team** (touches shared or non-serverless code): both `ddserverless-${HASH}` and `app-${HASH}` URLs
-- Ambiguous? Ask.
-
-Infer path from changed file paths. Feature flags: `?config_flag-name=true` URL params.
+For frontend-specific PR-description guidance, read ./frontend.md
