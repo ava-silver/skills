@@ -1,7 +1,6 @@
 ---
 name: subagents
-description: Right-size subagent delegations by deliberately choosing the model and reasoning effort before using subagent tools or workflow.
-allowed-tools: subagent_spawn, subagent_wait, subagent_cancel, subagent_check, subagent_list, workflow
+description: Right-size subagent delegations by deliberately choosing the model and reasoning effort before using subagent tools.
 ---
 
 # Subagents
@@ -19,6 +18,7 @@ Right-size each delegation before creating an agent.
    - `high`: ambiguous, cross-cutting, or high-risk work.
    - `xhigh`/`max`: exceptional problems where added cost is justified.
 4. Make the prompt self-contained: include the goal, working directory, relevant context and paths, constraints, expected output, and verification.
-5. Use `subagent_spawn` for standalone background work. Use `workflow` for phased dependencies, structured results, or coordinated fan-out. Parallelize only independent tasks.
+5. Use `subagent_spawn` for standalone background work. Keep dependent phases in one subagent or the parent; parallelize only independent tasks.
 6. State the chosen model and effort in one line, with a rationale.
-7. Validate returned work against the parent task before relying on it.
+7. Use `subagent_message` to answer a pending question, steer a running subagent, or reactivate a settled one.
+8. Validate returned work against the parent task before relying on it.
