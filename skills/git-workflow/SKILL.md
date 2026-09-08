@@ -13,8 +13,15 @@ Run `is-graphite` in the repository before choosing mutation or sync commands.
 - `graphite set up` -- use the Graphite commands below.
 - `graphite not set up` -- never use `gt`; use normal Git commands. `git cr` and `git ac` already adapt to either workflow. Note that for config repos like `dotfiles` or `skills`, you should just commit to the working branch.
 
+## Branch ownership safety
+Before changing commits, tracking, parents, or remotes, run `git branch --show-current` and confirm the branch is the current user's (`$USER/*`) or a repository default branch.
+
+- Never run `gt track`, restack, reparent, push, commit, or otherwise mutate a coworker's branch or stack.
+- A non-default branch outside `$USER/*` is not the user's unless the user explicitly says otherwise.
+- If work depends on a coworker's branch, stop and ask the user to prepare the branch or worktree. Do not create or attach it yourself.
+
 ## Branch naming
-Keep an existing branch name. When creating your own branch, use `ava.silver/{ticket}/{short-description}` -- e.g. `ava.silver/svls-1234/fix-timeout`.
+Keep an existing branch name only when it passes the ownership check above. When creating your own branch, use `ava.silver/{ticket}/{short-description}` -- e.g. `ava.silver/svls-1234/fix-timeout`.
 Chore/no-ticket: `ava.silver/chore/{description}`
 
 ## Starting work -- branch + first commit + PR in one shot
