@@ -251,6 +251,25 @@ def metadata(session: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+CITABLE_TYPES = {
+    ("message", "user"),
+    ("tool_error", None),
+    ("subagent_result", None),
+}
+
+
+def citable_records(session: dict[str, Any]) -> dict[str, str]:
+    """Return {record_id: text} for all records that may be cited as evidence."""
+    out: dict[str, str] = {}
+    for record in session["records"]:
+        rtype = record.get("type")
+        role = record.get("role")
+        if (rtype, role) in CITABLE_TYPES or (rtype, None) in CITABLE_TYPES:
+            text = record.get("text") or ""
+            out[record["record_id"]] = text
+    return out
+
+
 def validate_result(session: dict[str, Any], result: Any) -> None:
     if not isinstance(result, dict):
         raise TypeError("result must be a JSON object")
@@ -259,23 +278,22 @@ def validate_result(session: dict[str, Any], result: Any) -> None:
         raise TypeError("pain_points must be an array")
     if not isinstance(result.get("already_addressed_by"), str):
         raise TypeError("already_addressed_by must be a string")
-    user_records = {
-        record["record_id"]: record["text"]
-        for record in session["records"]
-        if record.get("type") == "message" and record.get("role") == "user"
-    }
+    citable = citable_records(session)
     for index, point in enumerate(pain_points):
         if not isinstance(point, dict):
             raise TypeError(f"pain_points[{index}] must be an object")
         record_id = point.get("record_id")
         quote = point.get("quote")
         severity = point.get("severity")
-        if record_id not in user_records:
-            raise ValueError(f"pain_points[{index}].record_id is not a user record")
+        if record_id not in citable:
+            raise ValueError(
+                f"pain_points[{index}].record_id is not a citable record "
+                f"(user message, tool_error, or subagent_result)"
+            )
         if (
             not isinstance(quote, str)
             or not quote
-            or quote not in user_records[record_id]
+            or quote not in citable[record_id]
         ):
             raise ValueError(
                 f"pain_points[{index}].quote is not exact evidence from its record"
@@ -308,6 +326,11 @@ def add_selection_arguments(
         "--session", action="append", default=[], help="Include this session ID"
     )
     parser.add_argument("--limit", type=int, default=default_limit)
+    parser.add_argument(
+        "--include-reviewed",
+        action="store_true",
+        help="Include sessions already in reviewed.json",
+    )
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -332,6 +355,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     add_selection_arguments(extract_parser, DEFAULT_BATCH_SIZE)
     extract_parser.add_argument("--output-dir", type=Path, required=True)
+    extract_parser.add_argument(
+        "--file",
+        action="append",
+        dest="files",
+        default=[],
+        type=Path,
+        help="Extract a specific session file (bypasses discovery and reviewed filter)",
+    )
+
+    read_parser = commands.add_parser(
+        "read",
+        help="Print the formatted transcript of one session (by ID or file path)",
+    )
+    read_group = read_parser.add_mutually_exclusive_group(required=True)
+    read_group.add_argument("--session", dest="read_session", help="Session ID")
+    read_group.add_argument(
+        "--file", dest="read_file", type=Path, help="Session .jsonl file path"
+    )
 
     validate_parser = commands.add_parser(
         "validate", help="Validate one result and optionally checkpoint it"
@@ -354,6 +395,27 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"valid": True, "source_ids": session["source_ids"]}))
             return 0
 
+        if args.command == "read":
+            if args.read_file:
+                session = extract_session(args.read_file)
+                if session is None:
+                    raise ValueError(f"Could not parse session from {args.read_file}")
+            else:
+                active_file = (
+                    Path(value).expanduser()
+                    if (value := os.environ.get("PI_SESSION_FILE"))
+                    else None
+                )
+                all_sessions = discover_sessions(args.session_root, active_file)
+                matches = [
+                    s for s in all_sessions if args.read_session in s["source_ids"]
+                ]
+                if not matches:
+                    raise ValueError(f"Session {args.read_session!r} not found")
+                session = matches[0]
+            print(json.dumps(session, indent=2))
+            return 0
+
         if args.limit is not None and args.limit < 1:
             raise ValueError("--limit must be positive")
         if args.command == "extract" and args.limit > MAX_BATCH_SIZE:
@@ -364,17 +426,34 @@ def main(argv: list[str] | None = None) -> int:
             else None
         )
         reviewed = load_reviewed(args.state)
-        sessions = discover_sessions(args.session_root, active_file)
-        selected = select_sessions(
-            sessions, reviewed, args.cwd, args.session, args.limit
-        )
+        effective_reviewed = set() if getattr(args, "include_reviewed", False) else reviewed
+
+        if args.command == "extract" and getattr(args, "files", []):
+            # Extract specific files directly, bypassing discovery and reviewed filter
+            direct_sessions = []
+            for file_path in args.files:
+                s = extract_session(file_path)
+                if s:
+                    direct_sessions.append(s)
+            sessions_to_write = direct_sessions
+        else:
+            sessions = discover_sessions(args.session_root, active_file)
+            selected = select_sessions(
+                sessions, effective_reviewed, args.cwd, args.session, args.limit
+            )
+            sessions_to_write = selected
+
         if args.command == "list":
+            sessions = discover_sessions(args.session_root, active_file)
+            selected = select_sessions(
+                sessions, effective_reviewed, args.cwd, args.session, args.limit
+            )
             print(json.dumps([metadata(session) for session in selected], indent=2))
             return 0
 
         args.output_dir.mkdir(parents=True, exist_ok=True)
         index = []
-        for session in selected:
+        for session in sessions_to_write:
             session_path = args.output_dir / f"{session['id']}.json"
             write_json_atomic(session_path, session)
             index.append(metadata(session) | {"path": str(session_path)})
