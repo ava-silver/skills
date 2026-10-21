@@ -13,7 +13,7 @@ Right-size each delegation before creating an agent.
   1. Keeping context minimal -- you're already coordinating a long running session and inspecting the code directly would dramatically increase context bloat.
   2. Parallel work where multiple subagents would save time.
   3. Independent analysis for improved confidence.
-2. Recommend `openai-codex/gpt-5.6-terra` by default. Recommend `openai-codex/gpt-5.6-sol` instead when the task requires more thorough reasoning, such as ambiguous architecture, broad synthesis, or high-risk work. Override this choice only when another model materially improves the outcome.
+2. Recommend `openai-codex/gpt-6-luna` or `anthropic/claude-sonnet-5-5` by default. Recommend `openai-codex/gpt-6.1-sol` or `anthropic/claude-opus-5-5` instead when the task requires more thorough reasoning, such as ambiguous architecture, broad synthesis, or high-risk work. Override this choice only when another model materially improves the outcome.
 3. Right-size reasoning effort:
    - `off`/`minimal`: deterministic or clerical work.
    - `low`: routine, tightly scoped work.
