@@ -1,3 +1,5 @@
+Note: I no longer maintain this as a separate repo, and instead maintain it through https://github.com/ava-silver/pi-config/tree/main/skills
+
 This is a repo where I can put all the skills for various agents
 
 Install with:
